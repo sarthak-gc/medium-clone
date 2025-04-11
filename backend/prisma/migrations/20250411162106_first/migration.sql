@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Follow" ALTER COLUMN "followedAt" SET DEFAULT CURRENT_TIMESTAMP;

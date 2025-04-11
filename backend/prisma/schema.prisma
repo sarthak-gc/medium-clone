@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  userId     String   @unique @default(uuid())
+  username   String   @unique
+  email      String   @unique
+  password   String
+  createdAt  DateTime @default(now())
+  profile    UserType @default(PUBLIC)
+  isDeleted  Boolean  @default(false)
+  profilePic String?
+
+  Comments  Comment[]
+  followers Follow[]  @relation("Followers")
+  following Follow[]  @relation("Followings")
+  posts     Post[]
+}
+
+model Post {
+  postId     String    @unique @default(uuid())
+  title      String
+  content    String
+  authorId   String
+  reactions  Int       @default(0)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  visibility PostType  @default(PRIVATE)
+  isDeleted  Boolean   @default(false)
+  Comment    Comment[] @relation("PostComments")
+  User       User      @relation(fields: [authorId], references: [userId])
+}
+
+model Follow {
+  followId     String    @unique @default(uuid())
+  followerId   String
+  followingId  String
+  followedAt   DateTime  @default(now())
+  unfollowedAt DateTime?
+  isFollowing  Boolean   @default(true)
+  isBlocked    Boolean   @default(false)
+  Follower     User      @relation("Followers", fields: [followerId], references: [userId])
+  Following    User      @relation("Followings", fields: [followingId], references: [userId])
+}
+
+model Comment {
+  commentId   String    @unique @default(uuid())
+  content     String
+  postId      String
+  commenterId String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  isUpdated   Boolean   @default(false)
+  parentId    String?
+  User        User      @relation(fields: [commenterId], references: [userId])
+  parent      Comment?  @relation("CommentReplies", fields: [parentId], references: [commentId])
+  replies     Comment[] @relation("CommentReplies")
+  Post        Post      @relation("PostComments", fields: [postId], references: [postId])
+}
+
+enum UserType {
+  PRIVATE
+  PUBLIC
+}
+
+enum PostType {
+  PRIVATE
+  PUBLIC
+  DRAFT
+}
