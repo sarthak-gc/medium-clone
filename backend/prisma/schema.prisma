@@ -19,23 +19,39 @@ model User {
   profilePic String?
 
   Comments  Comment[]
-  followers Follow[]  @relation("Followers")
-  following Follow[]  @relation("Followings")
-  posts     Post[]
+  followers Follow[]    @relation("Followers")
+  following Follow[]    @relation("Followings")
+  blogs     Blog[]      @relation("UploadedBlogs")
+  Reactions Reactions[]
 }
 
-model Post {
-  postId     String    @unique @default(uuid())
+model Blog {
+  blogId     String    @unique @default(uuid())
   title      String
   content    String
   authorId   String
   reactions  Int       @default(0)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
-  visibility PostType  @default(PRIVATE)
+  visibility BlogType  @default(PRIVATE)
   isDeleted  Boolean   @default(false)
-  Comment    Comment[] @relation("PostComments")
-  User       User      @relation(fields: [authorId], references: [userId])
+  Comment    Comment[] @relation("BlogComments")
+
+  User      User        @relation("UploadedBlogs", fields: [authorId], references: [userId])
+  Reactions Reactions[]
+}
+
+model Reactions {
+  blogId    String
+  userId    String
+  type      ReactionType
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  Blog Blog @relation(fields: [blogId], references: [blogId])
+  User User @relation(fields: [userId], references: [userId])
+
+  @@unique([blogId, userId])
 }
 
 model Follow {
@@ -53,7 +69,7 @@ model Follow {
 model Comment {
   commentId   String    @unique @default(uuid())
   content     String
-  postId      String
+  blogId      String
   commenterId String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -62,7 +78,7 @@ model Comment {
   User        User      @relation(fields: [commenterId], references: [userId])
   parent      Comment?  @relation("CommentReplies", fields: [parentId], references: [commentId])
   replies     Comment[] @relation("CommentReplies")
-  Post        Post      @relation("PostComments", fields: [postId], references: [postId])
+  Blog        Blog      @relation("BlogComments", fields: [blogId], references: [blogId])
 }
 
 enum UserType {
@@ -70,8 +86,16 @@ enum UserType {
   PUBLIC
 }
 
-enum PostType {
+enum BlogType {
   PRIVATE
   PUBLIC
   DRAFT
+}
+
+enum ReactionType {
+  HEART
+  LIKE
+  LAUGH
+  ANGRY
+  DISLIKE
 }

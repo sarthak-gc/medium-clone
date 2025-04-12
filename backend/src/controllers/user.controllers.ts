@@ -156,7 +156,7 @@ export const getProfile = async (c: Context) => {
         message: "Follow the person to view their profile",
       });
     }
-    const userPosts = await prisma.post.findMany({
+    const userBlogs = await prisma.blog.findMany({
       where: {
         authorId: userId,
       },

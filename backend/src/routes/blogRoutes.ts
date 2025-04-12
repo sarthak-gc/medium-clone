@@ -1,24 +1,27 @@
 import { Hono } from "hono";
-import { createBlog } from "../controllers/blog.controllers";
+import {
+  commentOnBlog,
+  createBlog,
+  getPublicBlogs,
+  getBlog,
+  reactBlog,
+  replyToComment,
+} from "../controllers/blog.controllers";
 import { authenticationMiddleware } from "../middleware/authMiddleware";
+import { publicAccessMiddleware } from "../middleware/publicAccessMiddleware";
 
 const blogRouter = new Hono();
 
-blogRouter.post("/create", authenticationMiddleware, createBlog);
+blogRouter.get("/public", publicAccessMiddleware, getPublicBlogs);
 
-blogRouter.put("/", async (c) => {
-  return c.text("updated");
-});
+blogRouter.use(authenticationMiddleware);
 
-blogRouter.get("/following/:userId", async (c) => {
-  return c.text("retrieved user details");
-});
+blogRouter.post("/create", createBlog);
+blogRouter.post("/:blogId/react", reactBlog);
+blogRouter.post("/:blogId/comment", commentOnBlog);
+blogRouter.post("/:commentId/reply", replyToComment);
 
-blogRouter.get("/all", async (c) => {
-  return c.text("retrieved all");
-});
+blogRouter.use();
+blogRouter.get("/:blogId", getBlog);
 
-blogRouter.get("/:blogId", async (c) => {
-  return c.text(" retrieved");
-});
 export default blogRouter;
