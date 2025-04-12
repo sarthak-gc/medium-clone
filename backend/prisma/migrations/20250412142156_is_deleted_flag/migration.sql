@@ -61,7 +61,8 @@ CREATE TABLE "Comment" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "isUpdated" BOOLEAN NOT NULL DEFAULT false,
-    "parentId" TEXT
+    "parentId" TEXT,
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false
 );
 
 -- CreateIndex

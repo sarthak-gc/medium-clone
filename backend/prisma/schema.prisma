@@ -67,18 +67,20 @@ model Follow {
 }
 
 model Comment {
-  commentId   String    @unique @default(uuid())
+  commentId   String   @unique @default(uuid())
   content     String
   blogId      String
   commenterId String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  isUpdated   Boolean   @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isUpdated   Boolean  @default(false)
   parentId    String?
-  User        User      @relation(fields: [commenterId], references: [userId])
-  parent      Comment?  @relation("CommentReplies", fields: [parentId], references: [commentId])
-  replies     Comment[] @relation("CommentReplies")
-  Blog        Blog      @relation("BlogComments", fields: [blogId], references: [blogId])
+  isDeleted   Boolean  @default(false)
+
+  User    User      @relation(fields: [commenterId], references: [userId])
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [commentId])
+  replies Comment[] @relation("CommentReplies")
+  Blog    Blog      @relation("BlogComments", fields: [blogId], references: [blogId])
 }
 
 enum UserType {

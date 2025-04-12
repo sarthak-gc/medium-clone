@@ -8,7 +8,7 @@ export const addBlog = async (
   authorId: string,
   visibility: BlogType
 ) => {
-  await prisma.blog.create({
+  return await prisma.blog.create({
     data: {
       title,
       content,
@@ -61,6 +61,7 @@ export const changeReaction = async (
     },
   });
 };
+
 export const addReaction = async (
   prisma: PrismaClient,
   userId: string,
@@ -154,6 +155,27 @@ export const findComment = async (prisma: PrismaClient, commentId: string) => {
   return comment;
 };
 
+export const getUserBlogs = async (prisma: PrismaClient, profileId: string) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      userId: profileId,
+    },
+  });
+
+  if (!user) {
+    throw Error("No user found with that id");
+  }
+  const blogs = await prisma.blog.findMany({
+    where: {
+      authorId: profileId,
+      isDeleted: false,
+      OR: [{ visibility: "PRIVATE" }, { visibility: "PUBLIC" }],
+    },
+  });
+
+  return blogs;
+};
+
 // ------------------------------input validations------------------------------
 
 export const getValidComment = (comment: string) => {
@@ -202,4 +224,75 @@ export const getValidReaction = (c: Context, type: string) => {
   }
 
   return reactionMap.get(type);
+};
+
+export const getSelfBlogs = async (prisma: PrismaClient, userId: string) => {
+  const blogs = await prisma.blog.findMany({
+    where: { authorId: userId },
+    select: {
+      blogId: true,
+      title: true,
+      content: true,
+      authorId: true,
+      reactions: true,
+      visibility: true,
+    },
+  });
+
+  return blogs;
+};
+
+export const changeBlogContent = async (
+  prisma: PrismaClient,
+  blogId: string,
+  content: string
+) => {
+  await prisma.blog.update({
+    where: {
+      blogId,
+    },
+    data: {
+      content,
+    },
+  });
+};
+
+export const updateComment = async (
+  prisma: PrismaClient,
+  commentId: string,
+  content: string
+) => {
+  await prisma.comment.update({
+    where: {
+      commentId,
+    },
+    data: {
+      content,
+    },
+  });
+};
+
+export const justDeleteBlog = async (prisma: PrismaClient, blogId: string) => {
+  await prisma.blog.update({
+    where: {
+      blogId,
+    },
+    data: {
+      isDeleted: true,
+    },
+  });
+};
+
+export const justDeleteComment = async (
+  prisma: PrismaClient,
+  commentId: string
+) => {
+  await prisma.comment.update({
+    where: {
+      commentId,
+    },
+    data: {
+      isDeleted: true,
+    },
+  });
 };

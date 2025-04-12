@@ -1,9 +1,14 @@
 import { hash } from "../utils/hashPassword";
-import { PrismaClient, UserType } from "../generated/prisma/edge";
-import { sign } from "hono/jwt";
 import { setCookie } from "hono/cookie";
 import { Context } from "hono";
 import { getPrisma } from "../utils/generatePrisma";
+import {
+  createUser,
+  findUser,
+  generateAccessToken,
+  generateRefreshToken,
+  getValidProfileStatus,
+} from "../utils/users";
 
 export const signUp = async (c: Context) => {
   const body = await c.req.json();
@@ -11,25 +16,19 @@ export const signUp = async (c: Context) => {
 
   try {
     const { username, email, password, profile } = body;
-    if (profile) {
-      if (typeof profile !== "string") {
-        return c.json({ status: "error", message: "Invalid profile type" });
-      }
-
-      if (profile.trim().toLowerCase() === "private") {
-        profileStatus = "PRIVATE";
-      }
+    try {
+      profileStatus = getValidProfileStatus(profile);
+    } catch (e) {
+      console.log(e);
+      if (e instanceof Error)
+        return c.json({ status: "error", message: e.message });
     }
 
     const prisma = getPrisma(c);
 
-    const userExists = await prisma.user.findFirst({
-      where: {
-        OR: [{ email }, { username }],
-      },
-    });
+    const user = await findUser(prisma, email, username);
 
-    if (userExists) {
+    if (user) {
       c.status(400);
       return c.json({
         status: "error",
@@ -37,15 +36,7 @@ export const signUp = async (c: Context) => {
       });
     }
     const hashedPassword = hash(password, username);
-    await prisma.user.create({
-      data: {
-        username,
-        email,
-        password: hashedPassword,
-        profile:
-          profileStatus === "PRIVATE" ? UserType.PRIVATE : UserType.PUBLIC,
-      },
-    });
+    await createUser(prisma, email, username, hashedPassword, profileStatus);
 
     return c.json({ status: "success", message: "user created" });
   } catch (e) {
@@ -77,24 +68,9 @@ export const signIn = async (c: Context) => {
       });
     }
 
-    const refreshToken = await sign(
-      {
-        user: { userId: userExists.userId },
-        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30,
-      },
-      c.env.JWT_SECRET_FOR_REFRESH_TOKEN
-    );
+    const refreshToken = await generateRefreshToken(c, userExists);
 
-    const accessToken = await sign(
-      {
-        user: {
-          userId: userExists.userId,
-          email: userExists.email,
-          exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
-        },
-      },
-      c.env.JWT_SECRET_FOR_ACCESS_TOKEN
-    );
+    const accessToken = await generateAccessToken(c, userExists);
 
     setCookie(c, "token", refreshToken, {
       httpOnly: true,
@@ -156,22 +132,23 @@ export const getProfile = async (c: Context) => {
         message: "Follow the person to view their profile",
       });
     }
-    const userBlogs = await prisma.blog.findMany({
-      where: {
-        authorId: userId,
-      },
-    });
-    return c.json({
-      status: "success",
-      message: "User Info received",
-      data: {
-        // userInfo,
-        // userPosts,
 
-        me: userDetails,
-        other: userInfo,
-      },
-    });
+    if (userInfo.profile === "PUBLIC") {
+      // if follows let them see all, if doesn't follow then just public posts
+      const userBlogs = await prisma.blog.findMany({
+        where: {
+          authorId: userId,
+        },
+      });
+      return c.json({
+        status: "success",
+        message: "User Info received",
+        data: {
+          userBlogs,
+          other: userInfo,
+        },
+      });
+    }
   } catch (e) {
     console.log(e);
     return c.json({
@@ -183,6 +160,7 @@ export const getProfile = async (c: Context) => {
 
 export const updatePassword = async (c: Context) => {
   const user = c.get("user");
+  const userDetails = c.get("userDetails");
   const { password } = await c.req.json();
 
   if (!password.trim()) {
@@ -194,17 +172,22 @@ export const updatePassword = async (c: Context) => {
   }
 
   try {
+    const { username } = userDetails;
+    const hashedPassword = hash(password, username);
     const prisma = getPrisma(c);
-    const updatedUser = await prisma.user.update({
+    await prisma.user.update({
       where: {
         userId: user.userId,
       },
       data: {
-        password,
+        password: hashedPassword,
       },
     });
 
-    return c.json({ status: "success", message: "Password updated" });
+    return c.json({
+      status: "success",
+      message: "Password updated",
+    });
   } catch (e) {
     console.log(e);
     c.status(500);
