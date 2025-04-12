@@ -10,6 +10,7 @@ import {
   findBlog,
   findComment,
   findReaction,
+  getComments,
   getSelfBlogs,
   getUserBlogs,
   getValidComment,
@@ -50,7 +51,6 @@ export const createBlog = async (c: Context) => {
       },
     });
   } catch (e) {
-    console.log(e);
     return handleError(e, c);
   }
 };
@@ -69,14 +69,6 @@ export const reactBlog = async (c: Context) => {
     return handleError(e, c);
   }
   const prisma = getPrisma(c);
-  const blog = await findBlog(prisma, blogId);
-  if (!blog) {
-    return c.json({
-      status: "error",
-      message: "blog not found",
-    });
-  }
-
   const reaction = await findReaction(prisma, userId, blogId);
 
   if (reaction) {
@@ -109,14 +101,6 @@ export const commentOnBlog = async (c: Context) => {
   }
 
   const prisma = getPrisma(c);
-  const blog = await findBlog(prisma, blogId);
-  if (!blog) {
-    return c.json({
-      status: "error",
-      message: "blog not found",
-    });
-  }
-
   addComment(prisma, blogId, userId, comment);
   return c.json({ status: "success", message: "Comment posted" });
 };
@@ -152,7 +136,14 @@ export const replyToComment = async (c: Context) => {
 };
 
 export const getBlog = async (c: Context) => {
-  return c.json({ message: "specific blog" });
+  const blogs = c.get("blog");
+  return c.json({
+    status: "success",
+    message: "Blogs Retrieved",
+    data: {
+      blogs,
+    },
+  });
 };
 
 export const getPublicBlogs = async (c: Context) => {
@@ -326,4 +317,55 @@ export const deleteComment = async (c: Context) => {
     status: "success",
     message: "Deleted Comment",
   });
+};
+
+export const getBlogComments = async (c: Context) => {
+  const { userId } = c.get("user");
+  const { blogId } = c.req.param();
+
+  const prisma = getPrisma(c);
+  const blog = await findBlog(prisma, blogId);
+
+  if (!blog) {
+    return c.json({
+      status: "error",
+      message: "Blog not found",
+    });
+  }
+
+  const isFollowing = await prisma.follow.findFirst({
+    where: {
+      followerId: userId,
+      followingId: blog.authorId,
+      isFollowing: true,
+    },
+  });
+
+  const comments = await getComments(prisma, blogId);
+
+  if (isFollowing) {
+    return c.json({
+      status: "success",
+      message: "Comments retrieved",
+      data: {
+        comments,
+      },
+    });
+  }
+
+  if (blog.visibility === "PUBLIC") {
+    return c.json({
+      status: "success",
+      message: "Comments retrieved",
+    });
+  }
+
+  return c.json({
+    status: "error",
+    message: "Follow the author to view comment",
+  });
+};
+
+export const getReactions = (c: Context) => {
+  const { blogId } = c.req.param();
 };

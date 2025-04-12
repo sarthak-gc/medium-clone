@@ -6,23 +6,38 @@ import {
   updatePassword,
   logout,
   follow,
+  unfollow,
+  getSelfFollowers,
+  getSelfFollowing,
+  otherFollowers,
+  otherFollowing,
+  deleteProfile,
 } from "../controllers/user.controllers";
 import { authenticationMiddleware } from "../middleware/authMiddleware";
+// import { pictureUploadMiddleware } from "../middleware/pictureUploadMiddlware";
 
-const userRoutes = new Hono<{
-  Bindings: {
-    DATABASE_URL: string;
-    JWT_SECRET_REFRESH_TOKEN: string;
-    JWT_SECRET_ACCESS_TOKEN: string;
-  };
-}>();
+const userRoutes = new Hono();
 
 userRoutes.post("/signup", signUp);
 userRoutes.post("/signin", signIn);
 
-userRoutes.get("/userProfile/:userId", authenticationMiddleware, getProfile);
-userRoutes.put("/password", authenticationMiddleware, updatePassword);
-userRoutes.post("/follow/:userId", authenticationMiddleware, follow);
-userRoutes.post("/logout", authenticationMiddleware, logout);
+userRoutes.use(authenticationMiddleware);
+
+userRoutes.get("/userProfile/:profileId", getProfile);
+userRoutes.put("/password", updatePassword);
+
+userRoutes.post("/follow/:profileId", follow);
+userRoutes.post("/unfollow/:profileId", unfollow);
+
+userRoutes.post("/followers/self", getSelfFollowers);
+userRoutes.post("/following/self", getSelfFollowing);
+
+userRoutes.post("/followers/:profileId", otherFollowers);
+userRoutes.post("/following/:profileId", otherFollowing);
+userRoutes.post("/logout", logout);
+
+// userRoutes.put("/profile/update/picture", pictureUploadMiddleware, profilePic);
+
+userRoutes.delete("/delete/", deleteProfile);
 
 export default userRoutes;

@@ -127,6 +127,7 @@ export const findBlog = async (prisma: PrismaClient, blogId: string) => {
   const blog = await prisma.blog.findFirst({
     where: {
       blogId,
+      isDeleted: false,
     },
   });
   return blog;
@@ -295,4 +296,23 @@ export const justDeleteComment = async (
       isDeleted: true,
     },
   });
+};
+
+export const getComments = async (prisma: PrismaClient, blogId: string) => {
+  const comments = await prisma.comment.findMany({
+    where: {
+      blogId,
+      isDeleted: false,
+    },
+    include: {
+      User: {
+        select: {
+          username: true,
+          email: true,
+          userId: true,
+        },
+      },
+    },
+  });
+  return comments;
 };

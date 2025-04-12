@@ -28,7 +28,6 @@ export const authenticationMiddleware = async (c: Context, next: Next) => {
       },
     });
     if (!validUser) {
-      console.log("NOT HERE");
       c.status(403);
       return c.json({ message: "User doesn't exist" });
     }

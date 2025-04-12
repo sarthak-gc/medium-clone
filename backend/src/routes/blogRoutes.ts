@@ -12,24 +12,23 @@ import {
   editComment,
   deleteComment,
   deleteBlog,
+  getBlogComments,
+  // getReactions,
+  // searchBlogs, // let'see if i can
 } from "../controllers/blog.controllers";
 import { authenticationMiddleware } from "../middleware/authMiddleware";
 import { publicAccessMiddleware } from "../middleware/publicAccessMiddleware";
+import { visibilityMiddleware } from "../middleware/blogVisibility";
 
 const blogRouter = new Hono();
 
-blogRouter.get("/public", publicAccessMiddleware, getPublicBlogs);
+// blogRouter.get("/public", publicAccessMiddleware, getPublicBlogs);
 
 blogRouter.use(authenticationMiddleware);
 
 blogRouter.post("/create", createBlog);
-blogRouter.post("/:blogId/react", reactBlog);
-blogRouter.post("/:blogId/comment", commentOnBlog);
-blogRouter.post("/:commentId/reply", replyToComment);
 
-blogRouter.get("/:blogId", getBlog);
 blogRouter.get("/user/:profileId/all", getUserBlog);
-blogRouter.get("/self/all", getPersonalBlogs);
 
 blogRouter.put("/:blogId/edit", updateBlog);
 blogRouter.put("/comment/:commentId/edit", editComment);
@@ -38,5 +37,16 @@ blogRouter.put("/reply/:commentId/edit", editComment);
 blogRouter.delete("/:blogId", deleteBlog);
 blogRouter.delete("/comment/:commentId", deleteComment);
 blogRouter.delete("/reply/:replyId", deleteComment);
+blogRouter.get("/self/all", getPersonalBlogs);
+
+blogRouter.post("/:commentId/reply", replyToComment);
+
+// blogRouter.use();
+blogRouter.get("/:blogId", visibilityMiddleware, getBlog);
+blogRouter.post("/:blogId/react", visibilityMiddleware, reactBlog);
+blogRouter.post("/:blogId/comment", visibilityMiddleware, commentOnBlog);
+blogRouter.get("/:blogId/comments/", visibilityMiddleware, getBlogComments);
+// blogRouter.get("/search", searchBlogs); // let'see if i can
+// blogRouter.get("/:blogId/react", getReactions);
 
 export default blogRouter;

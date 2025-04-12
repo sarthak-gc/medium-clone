@@ -1,5 +1,4 @@
-import { PrismaClient } from "@prisma/client/extension";
-import { UserType } from "../generated/prisma";
+import { PrismaClient, UserType } from "../generated/prisma";
 import { sign } from "hono/jwt";
 import { Context } from "hono";
 
@@ -13,6 +12,40 @@ interface UserI {
   isDeleted: boolean;
   profilePic: string | null;
 }
+
+export const passUpdate = async (
+  prisma: PrismaClient,
+  userId: string,
+  hashedPassword: string
+) => {
+  console.log(userId);
+
+  await prisma.user.update({
+    where: {
+      userId,
+    },
+    data: {
+      password: hashedPassword,
+    },
+  });
+};
+
+export const getDetail = async (prisma: PrismaClient, userId: string) => {
+  const details = await prisma.user.findUnique({
+    where: {
+      userId,
+    },
+    select: {
+      userId: true,
+      username: true,
+      email: true,
+      profile: true,
+      profilePic: true,
+      createdAt: true,
+    },
+  });
+  return details;
+};
 
 export const findUser = async (
   prisma: PrismaClient,
@@ -46,10 +79,14 @@ export const createUser = async (
 };
 
 export const getValidProfileStatus = (profile: string) => {
-  if (profile.trim().toLowerCase() === "private") {
+  if (!profile) {
+    return "PUBLIC";
+  } else if (profile.trim().toLowerCase() === "private") {
     return "PRIVATE";
+  } else if (profile.trim().toLowerCase() === "public") {
+    return "PUBLIC";
   } else {
-    throw Error("Invalid  type");
+    throw Error("Invalid Profile type");
   }
 };
 
@@ -74,4 +111,109 @@ export const generateAccessToken = async (c: Context, user: UserI) => {
     },
     c.env.JWT_SECRET_FOR_ACCESS_TOKEN
   );
+};
+export const followAgain = async (prisma: PrismaClient, followId: string) => {
+  await prisma.follow.update({
+    where: {
+      followId,
+    },
+    data: {
+      isFollowing: true,
+      unfollowedAt: null,
+    },
+  });
+};
+
+export const newFollow = async (
+  prisma: PrismaClient,
+  followerId: string,
+  followingId: string
+) => {
+  await prisma.follow.create({
+    data: {
+      followingId,
+      followerId,
+    },
+  });
+};
+
+export const removeFollow = async (
+  prisma: PrismaClient,
+
+  followId: string
+) => {
+  await prisma.follow.update({
+    where: {
+      followId,
+    },
+    data: {
+      isFollowing: false,
+    },
+  });
+};
+
+export const findProfile = async (prisma: PrismaClient, userId: string) => {
+  const profile = await prisma.user.findFirst({
+    where: {
+      userId,
+    },
+  });
+  return profile;
+};
+
+// while getting the following and follower list, the condition might seem a bit confusing as it might seem like i am fetching follower while trying to fetch the following and vice versa, but this makes sense as if a follows  1 2 3, then to the data is stored as following in the table
+
+//  followerId | followingId
+//      a             1
+//      a             2
+//      a             3
+//      a             4
+
+// so to fetch the following list of a here, we need to fetch the data from by taking the followerId
+
+// in short,
+// to get following list of a user → filter by followerId
+// to get followers of a user → filter by followingId
+
+export const getFollowers = async (prisma: PrismaClient, userId: string) => {
+  const followers = await prisma.follow.findMany({
+    where: {
+      followingId: userId,
+    },
+  });
+  return followers;
+};
+
+export const getFollowing = async (prisma: PrismaClient, userId: string) => {
+  const followings = await prisma.follow.findMany({
+    where: {
+      followerId: userId,
+    },
+  });
+  return followings;
+};
+
+export const getPostsForFollower = async (
+  prisma: PrismaClient,
+  authorId: string
+) => {
+  const userBlogs = await prisma.blog.findMany({
+    where: {
+      authorId,
+      OR: [{ visibility: "PRIVATE" }, { visibility: "PUBLIC" }],
+    },
+  });
+  return userBlogs;
+};
+export const getPostsForPublic = async (
+  prisma: PrismaClient,
+  authorId: string
+) => {
+  const userBlogs = await prisma.blog.findMany({
+    where: {
+      authorId,
+      visibility: "PUBLIC",
+    },
+  });
+  return userBlogs;
 };
