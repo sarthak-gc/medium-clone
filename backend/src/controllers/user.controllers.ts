@@ -20,7 +20,7 @@ import {
   removeFollow,
 } from "../utils/users";
 import { handleError } from "../utils/handleError";
-import { UserType } from "../generated/prisma";
+import { BlogType, ReactionType, UserType } from "../generated/prisma";
 
 export const signUp = async (c: Context) => {
   try {
@@ -208,18 +208,37 @@ export const follow = async (c: Context) => {
 
   const { profileId: followingId } = c.req.param();
   const prisma = getPrisma(c);
-
+  if (followingId === follower.userId) {
+    return c.json({
+      status: "error",
+      message: "you cannot perform this action with your own profile",
+    });
+  }
   const followingPreviouslyUnfollowed = await prisma.follow.findFirst({
     where: {
       followingId,
       followerId: follower.userId,
+      isFollowing: false,
+    },
+  });
+  const isFollowing = await prisma.follow.findFirst({
+    where: {
+      followerId: follower.userId,
+      followingId,
       isFollowing: true,
     },
   });
+
+  if (isFollowing) {
+    return c.json({
+      status: "error",
+      message: "you are already following this profile",
+    });
+  }
   if (followingPreviouslyUnfollowed) {
-    followAgain(prisma, followingPreviouslyUnfollowed.followId);
+    await followAgain(prisma, followingPreviouslyUnfollowed.followId);
   } else {
-    newFollow(prisma, follower.userId, followingId);
+    await newFollow(prisma, follower.userId, followingId);
   }
 
   return c.json({
@@ -232,8 +251,13 @@ export const unfollow = async (c: Context) => {
   const follower = c.get("user");
 
   const { profileId: followingId } = c.req.param();
-  console.log(follower.userId, followingId);
 
+  if (followingId === follower.userId) {
+    return c.json({
+      status: "error",
+      message: "you cannot perform this action with your own profile",
+    });
+  }
   const prisma = getPrisma(c);
 
   const follows = await prisma.follow.findFirst({
@@ -258,9 +282,12 @@ export const unfollow = async (c: Context) => {
     });
   }
 
-  removeFollow(prisma, follows.followId);
+  await removeFollow(prisma, follows.followId);
 
-  return c.text("here");
+  return c.json({
+    status: "success",
+    message: "unfollowed successfully",
+  });
 };
 
 export const getSelfFollowers = async (c: Context) => {
@@ -424,3 +451,171 @@ export const deleteProfile = async (c: Context) => {
 };
 
 export const profilePic = async (c: Context) => {};
+
+export const searchUser = async (c: Context) => {
+  const query = c.req.query("query");
+  const userDetails = c.get("userDetails");
+  const { skip } = c.req.param();
+
+  const startFrom = parseInt(skip);
+
+  if (isNaN(startFrom)) {
+    return c.json({
+      status: "error",
+      message: "Invalid starting index",
+    });
+  }
+  const take = 10;
+  if (!query) {
+    return c.json({
+      status: "error",
+      message: "No keyword found",
+    });
+  }
+
+  console.log(query);
+
+  const prisma = getPrisma(c);
+
+  const users = await prisma.user.findMany({
+    skip: startFrom,
+    take,
+
+    where: {
+      username: {
+        contains: query,
+      },
+      NOT: { username: userDetails.username },
+    },
+  });
+
+  return c.json({
+    users,
+  });
+};
+
+import { faker } from "@faker-js/faker";
+
+export const seedData = async (c: Context) => {
+  const prisma = getPrisma(c);
+  const users = [];
+
+  // Step 1: Create 10 users
+  for (let i = 0; i < 10; i++) {
+    const user = await prisma.user.create({
+      data: {
+        username: faker.internet.username(),
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+        profile: UserType.PUBLIC,
+      },
+    });
+    users.push(user);
+  }
+
+  console.log("10 users created");
+
+  // Step 2: Random followings
+  for (const user of users) {
+    const followCount = faker.number.int({ min: 1, max: 5 });
+    const toFollow = users
+      .filter((u) => u.userId !== user.userId)
+      .sort(() => 0.5 - Math.random())
+      .slice(0, followCount);
+
+    for (const follow of toFollow) {
+      await prisma.follow.create({
+        data: {
+          followerId: user.userId,
+          followingId: follow.userId,
+        },
+      });
+    }
+  }
+
+  console.log("random followings added");
+
+  const blogs = [];
+
+  // Step 3: Each user creates 4 blogs
+  for (const user of users) {
+    for (let i = 0; i < 4; i++) {
+      const contentLength = faker.number.int({ min: 20, max: 100 });
+      const blog = await prisma.blog.create({
+        data: {
+          title: faker.lorem.sentence(),
+          content: faker.lorem.text().slice(0, contentLength),
+          authorId: user.userId,
+          visibility:
+            i === 0
+              ? BlogType.DRAFT
+              : i % 3 === 0
+              ? BlogType.PRIVATE
+              : BlogType.PUBLIC,
+        },
+      });
+      blogs.push(blog);
+    }
+  }
+
+  console.log("blogs created");
+
+  // Step 4: Each blog gets 2 random reactions
+  for (const blog of blogs) {
+    const reactedUsers = new Set();
+    while (reactedUsers.size < 2) {
+      const user = users[faker.number.int({ min: 0, max: users.length - 1 })];
+      if (reactedUsers.has(user.userId)) continue;
+
+      reactedUsers.add(user.userId);
+      const reactionType =
+        Object.values(ReactionType)[
+          faker.number.int({
+            min: 0,
+            max: Object.values(ReactionType).length - 1,
+          })
+        ];
+
+      await prisma.reactions.create({
+        data: {
+          type: reactionType,
+          userId: user.userId,
+          blogId: blog.blogId,
+        },
+      });
+    }
+  }
+
+  console.log("reactions added");
+
+  // Step 5: Random comments (0–10) per blog
+  for (const blog of blogs) {
+    const commentCount = faker.number.int({ min: 0, max: 10 });
+    for (let i = 0; i < commentCount; i++) {
+      const commenter =
+        users[faker.number.int({ min: 0, max: users.length - 1 })];
+      await prisma.comment.create({
+        data: {
+          content: faker.lorem.sentence(),
+          commenterId: commenter.userId,
+          blogId: blog.blogId,
+        },
+      });
+    }
+  }
+
+  console.log("comments added");
+
+  return c.json({ msg: "Quick seeding completed successfully" });
+};
+
+
+export const unSeedData = async (c: Context) => {
+  const prisma = getPrisma(c);
+  await prisma.comment.deleteMany();
+  await prisma.reactions.deleteMany();
+  await prisma.blog.deleteMany();
+  await prisma.follow.deleteMany();
+  await prisma.user.deleteMany();
+  return c.json({ msg: "Seeding completed successfully" });
+};

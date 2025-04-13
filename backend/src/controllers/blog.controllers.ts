@@ -23,6 +23,7 @@ import {
 } from "../utils/blogs";
 import { handleError } from "../utils/handleError";
 import { BlogType } from "../generated/prisma";
+import { getFollowing } from "../utils/users";
 
 export const createBlog = async (c: Context) => {
   const body = await c.req.json();
@@ -73,20 +74,20 @@ export const reactBlog = async (c: Context) => {
 
   if (reaction) {
     if (reaction.type === type) {
-      removeReaction(prisma, userId, blogId);
+      await removeReaction(prisma, userId, blogId);
       return c.json({
         status: "success",
         message: "reaction removed",
       });
     } else {
-      changeReaction(prisma, userId, blogId, type);
+      await changeReaction(prisma, userId, blogId, type);
       return c.json({
         status: "success",
         message: "reaction changed",
       });
     }
   }
-  addReaction(prisma, userId, blogId, type);
+  await addReaction(prisma, userId, blogId, type);
   return c.json({ status: "success", message: "Reacted to the Blog" });
 };
 
@@ -146,7 +147,7 @@ export const getBlog = async (c: Context) => {
   });
 };
 
-export const getPublicBlogs = async (c: Context) => {
+export const getGlobalFeed = async (c: Context) => {
   const prisma = getPrisma(c);
   const blogs = await prisma.blog.findMany({
     where: {
@@ -160,6 +161,9 @@ export const getPublicBlogs = async (c: Context) => {
       authorId: true,
       reactions: true,
     },
+    orderBy: {
+      reactions: "desc",
+    },
   });
   return c.json({
     message: "Blogs Retrieved",
@@ -169,6 +173,42 @@ export const getPublicBlogs = async (c: Context) => {
   });
 };
 
+export const getFollowingFeed = async (c: Context) => {
+  const { userId } = c.get("user");
+  const prisma = getPrisma(c);
+
+  const followingIds = await getFollowing(prisma, userId);
+
+  const followIds = followingIds.map((follow) => follow.followingId);
+
+  const blogs = await prisma.blog.findMany({
+    where: {
+      isDeleted: false,
+      visibility: "PUBLIC",
+
+      authorId: {
+        in: followIds,
+      },
+    },
+    select: {
+      blogId: true,
+      title: true,
+      content: true,
+      authorId: true,
+      reactions: true,
+    },
+    orderBy: {
+      reactions: "desc",
+    },
+  });
+
+  return c.json({
+    message: "Blogs Retrieved",
+    data: {
+      blogs,
+    },
+  });
+};
 export const getUserBlog = async (c: Context) => {
   const { profileId } = c.req.param();
 
@@ -294,7 +334,6 @@ export const deleteComment = async (c: Context) => {
   const { userId } = c.get("user");
 
   const { commentId } = c.req.param();
-  const { content } = await c.req.json();
 
   const prisma = getPrisma(c);
   const comment = await findComment(prisma, commentId);
@@ -366,6 +405,83 @@ export const getBlogComments = async (c: Context) => {
   });
 };
 
-export const getReactions = (c: Context) => {
+export const getReactions = async (c: Context) => {
   const { blogId } = c.req.param();
+
+  const prisma = getPrisma(c);
+  const reactions = await prisma.reactions.findMany({
+    where: {
+      blogId,
+    },
+  });
+  return c.json({
+    reactions,
+    count: reactions.length,
+  });
+};
+
+export const getDrafts = async (c: Context) => {
+  const { userId } = c.get("user");
+
+  const prisma = getPrisma(c);
+
+  const draftBlogs = await prisma.blog.findMany({
+    where: {
+      authorId: userId,
+      visibility: "DRAFT",
+    },
+  });
+
+  return c.json({
+    status: "success",
+    message: "draft  retrieved",
+    data: {
+      blogs: draftBlogs,
+    },
+  });
+};
+
+export const searchBlogs = async (c: Context) => {
+  const query = c.req.query("query");
+  const { skip } = c.req.param();
+
+  const startFrom = isNaN(parseInt(skip)) ? 0 : parseInt(skip);
+
+  if (isNaN(startFrom)) {
+    return c.json({
+      status: "error",
+      message: "Invalid starting index",
+    });
+  }
+
+  if (!query) {
+    return c.json({
+      status: "error",
+      message: "No keyword found",
+    });
+  }
+  const userDetails = c.get("userDetails");
+
+  const prisma = getPrisma(c);
+
+  const blogs = await prisma.blog.findMany({
+    skip: startFrom,
+    take: 5,
+    where: {
+      OR: [
+        {
+          title: { contains: query },
+        },
+        { content: { contains: query } },
+      ],
+      NOT: { authorId: userDetails.userId },
+    },
+    orderBy: {
+      reactions: "desc",
+    },
+  });
+
+  return c.json({
+    blogs,
+  });
 };

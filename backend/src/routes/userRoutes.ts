@@ -12,18 +12,24 @@ import {
   otherFollowers,
   otherFollowing,
   deleteProfile,
+  searchUser,
+  // createDummyUsers,
 } from "../controllers/user.controllers";
 import { authenticationMiddleware } from "../middleware/authMiddleware";
+
 // import { pictureUploadMiddleware } from "../middleware/pictureUploadMiddlware";
 
 const userRoutes = new Hono();
 
+// userRoutes.post("/seedData", seedData);
+// userRoutes.post("/unSeedData", unSeedData);
 userRoutes.post("/signup", signUp);
 userRoutes.post("/signin", signIn);
 
 userRoutes.use(authenticationMiddleware);
 
 userRoutes.get("/userProfile/:profileId", getProfile);
+userRoutes.get("/search/:skip", searchUser);
 userRoutes.put("/password", updatePassword);
 
 userRoutes.post("/follow/:profileId", follow);

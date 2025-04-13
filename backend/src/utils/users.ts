@@ -113,6 +113,7 @@ export const generateAccessToken = async (c: Context, user: UserI) => {
   );
 };
 export const followAgain = async (prisma: PrismaClient, followId: string) => {
+  const followedAt = new Date(Date.now());
   await prisma.follow.update({
     where: {
       followId,
@@ -120,6 +121,7 @@ export const followAgain = async (prisma: PrismaClient, followId: string) => {
     data: {
       isFollowing: true,
       unfollowedAt: null,
+      followedAt,
     },
   });
 };
@@ -142,12 +144,14 @@ export const removeFollow = async (
 
   followId: string
 ) => {
+  const unfollowedAt = new Date(Date.now());
   await prisma.follow.update({
     where: {
       followId,
     },
     data: {
       isFollowing: false,
+      unfollowedAt,
     },
   });
 };
@@ -188,6 +192,8 @@ export const getFollowing = async (prisma: PrismaClient, userId: string) => {
   const followings = await prisma.follow.findMany({
     where: {
       followerId: userId,
+      isBlocked: false,
+      isFollowing: true,
     },
   });
   return followings;
