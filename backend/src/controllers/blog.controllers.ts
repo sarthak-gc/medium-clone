@@ -160,6 +160,36 @@ export const getGlobalFeed = async (c: Context) => {
       content: true,
       authorId: true,
       reactions: true,
+      createdAt: true,
+      Comment: {
+        select: {
+          createdAt: true,
+          isUpdated: true,
+          parentId: true,
+          commentId: true,
+          User: {
+            select: {
+              username: true,
+            },
+          },
+          content: true,
+        },
+      },
+      User: {
+        select: {
+          username: true,
+        },
+      },
+      Reactions: {
+        select: {
+          User: {
+            select: {
+              userId: true,
+              username: true,
+            },
+          },
+        },
+      },
     },
     orderBy: {
       reactions: "desc",
