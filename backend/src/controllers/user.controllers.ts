@@ -609,7 +609,6 @@ export const seedData = async (c: Context) => {
   return c.json({ msg: "Quick seeding completed successfully" });
 };
 
-
 export const unSeedData = async (c: Context) => {
   const prisma = getPrisma(c);
   await prisma.comment.deleteMany();

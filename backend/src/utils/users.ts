@@ -104,6 +104,7 @@ export const generateAccessToken = async (c: Context, user: UserI) => {
   return await sign(
     {
       user: {
+        username: user.username,
         userId: user.userId,
         email: user.email,
         exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
