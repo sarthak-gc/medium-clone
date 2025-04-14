@@ -125,11 +125,14 @@ const Login = () => {
         username: formData.username,
         password: formData.password,
       });
-
-      localStorage.setItem("token", response.data.data.accessToken);
+      const token = response.data.data.accessToken;
+      localStorage.setItem("token", token);
       alert(response.data.message);
+      document.cookie = `token=${token}; path=/; max-age=${3600 * 48}`;
+
       setIsLoggedIn(true);
-      navigate("/welcome");
+
+      navigate("/global");
     } catch (e) {
       if (e instanceof AxiosError) alert(e.response?.data.message);
     } finally {

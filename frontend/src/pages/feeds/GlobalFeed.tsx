@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { AXIOS } from "../../utils/axios";
-import BlogCard from "../../Components/blog/BlogCard";
-import ScrollBar from "../../Components/layout/ScrollBar";
 import { useNavigate } from "react-router-dom";
-// import { useParams } from "react-router-dom";
+import Feed from "./Feed";
+import ScrollBar from "../../Components/layout/ScrollBar";
 
 export type CommentT = {
   createdAt: Date;
@@ -57,16 +56,12 @@ const GlobalFeed = () => {
   return (
     <div className="px-4">
       <ScrollBar />
-      {blogs.map((blog: BlogT) => {
-        return (
-          <BlogCard
-            handleClick={handleClick}
-            key={blog.blogId}
-            blog={blog}
-            loading={loading}
-          />
-        );
-      })}
+      {!loading && blogs.length === 0 && (
+        <div className="w-full h-full  mt-50 text-center">
+          No Blogs In the home feed
+        </div>
+      )}
+      <Feed handleClick={handleClick} loading={loading} blogs={blogs} />
     </div>
   );
 };

@@ -5,9 +5,8 @@ import ImageSkeleton from "../skeleton/ImageSkeleton";
 type BlogCardProp = {
   blog: BlogT;
   handleClick: (id: string) => void;
-  loading: boolean;
 };
-const BlogCard = ({ blog, handleClick, loading }: BlogCardProp) => {
+const BlogCard = ({ blog, handleClick }: BlogCardProp) => {
   const [isLoading, setIsLoading] = useState(true);
 
   return (

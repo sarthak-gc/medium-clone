@@ -10,6 +10,7 @@ interface decodedUserI {
 export const authenticationMiddleware = async (c: Context, next: Next) => {
   const cookieToken = getCookie(c, "token");
   if (!cookieToken) {
+    c.status(403);
     return c.json({ status: "error", message: "No token found" });
   }
 

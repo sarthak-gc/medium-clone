@@ -11,11 +11,13 @@ import EditBlog from "./pages/blog/EditBlog";
 import PublicRoute from "./utils/PublicRoute";
 import NotFound from "./pages/extra/NotFound";
 import GlobalFeed from "./pages/feeds/GlobalFeed";
+import Random from "./pages/blog/Random";
+import FollowingFeed from "./pages/feeds/FollowingFeed";
 
 const App = () => {
   const router = createBrowserRouter([
     {
-      path: "/",
+      path: "/home",
       element: (
         <PublicRoute>
           <Home />
@@ -45,7 +47,6 @@ const App = () => {
       element: (
         <ProtectedRoute>
           <>
-            <Navbar />
             <Welcome />
           </>
         </ProtectedRoute>
@@ -71,7 +72,6 @@ const App = () => {
           element: (
             <ProtectedRoute>
               <>
-                <Navbar />
                 <Writeblog />
               </>
             </ProtectedRoute>
@@ -81,7 +81,6 @@ const App = () => {
           path: "read/:blogId",
           element: (
             <>
-              <Navbar />
               <ReadBlog />
             </>
           ),
@@ -91,7 +90,6 @@ const App = () => {
           element: (
             <ProtectedRoute>
               <>
-                <Navbar />
                 <EditBlog />
               </>
             </ProtectedRoute>
@@ -99,6 +97,44 @@ const App = () => {
         },
       ],
     },
+
+    {
+      path: "/",
+
+      children: [
+        {
+          path: "global",
+          element: (
+            <ProtectedRoute>
+              <>
+                <GlobalFeed />
+              </>
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "following",
+          element: (
+            <ProtectedRoute>
+              <>
+                <FollowingFeed />
+              </>
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "random",
+          element: (
+            <ProtectedRoute>
+              <>
+                <Random />
+              </>
+            </ProtectedRoute>
+          ),
+        },
+      ],
+    },
+
     {
       path: "*",
       element: (
@@ -106,17 +142,6 @@ const App = () => {
           <>
             <Navbar />
             <NotFound />,
-          </>
-        </ProtectedRoute>
-      ),
-    },
-    {
-      path: "/global",
-      element: (
-        <ProtectedRoute>
-          <>
-            <Navbar />
-            <GlobalFeed />
           </>
         </ProtectedRoute>
       ),
