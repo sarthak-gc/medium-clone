@@ -47,6 +47,7 @@ const App = () => {
       element: (
         <ProtectedRoute>
           <>
+            <Navbar />
             <Welcome />
           </>
         </ProtectedRoute>
@@ -78,9 +79,10 @@ const App = () => {
           ),
         },
         {
-          path: "read/:blogId",
+          path: ":blogId/read",
           element: (
             <>
+              <Navbar />
               <ReadBlog />
             </>
           ),
@@ -97,16 +99,15 @@ const App = () => {
         },
       ],
     },
-
     {
       path: "/",
-
       children: [
         {
-          path: "global",
+          path: "",
           element: (
             <ProtectedRoute>
               <>
+                <Navbar />
                 <GlobalFeed />
               </>
             </ProtectedRoute>
@@ -117,16 +118,30 @@ const App = () => {
           element: (
             <ProtectedRoute>
               <>
+                <Navbar />
+
                 <FollowingFeed />
               </>
             </ProtectedRoute>
           ),
         },
         {
-          path: "random",
+          path: "random/:feedName",
           element: (
             <ProtectedRoute>
               <>
+                <Navbar />
+                <Random />
+              </>
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "random/",
+          element: (
+            <ProtectedRoute>
+              <>
+                <Navbar />
                 <Random />
               </>
             </ProtectedRoute>
@@ -141,7 +156,7 @@ const App = () => {
         <ProtectedRoute>
           <>
             <Navbar />
-            <NotFound />,
+            <NotFound />
           </>
         </ProtectedRoute>
       ),

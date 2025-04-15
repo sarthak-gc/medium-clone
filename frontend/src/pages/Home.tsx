@@ -8,6 +8,11 @@ const Home = () => {
   return (
     <div
       className={`min-h-screen flex flex-col w-full h-screen overflow-hidden bg-[#f7f4ed]`}
+      onClick={() => {
+        if (popUp) {
+          setPopUp(false);
+        }
+      }}
     >
       <nav
         className={`py-4 flex  justify-center items-center border-b border-black  ${
@@ -83,7 +88,7 @@ const Home = () => {
         </div>
       </main>
 
-      <SignUpPopup popUp={popUp} setPopUp={setPopUp} />
+      <SignUpPopup popUp={popUp} />
     </div>
   );
 };

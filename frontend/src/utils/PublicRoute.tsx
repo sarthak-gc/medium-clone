@@ -8,7 +8,7 @@ type PublicRouteP = {
 
 const PublicRoute = ({ children }: PublicRouteP) => {
   if (isLoggedIn()) {
-    return <Navigate to={"/welcome"} replace />;
+    return <Navigate to={"/"} replace />;
   }
 
   return children;

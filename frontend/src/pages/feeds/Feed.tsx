@@ -1,6 +1,5 @@
 import { BlogT } from "./GlobalFeed";
 import BlogCardSkeleton from "../../Components/skeleton/BlogCardSkeleton";
-import Spinner from "../../Components/loaders/Spinner";
 import BlogCard from "../../Components/blog/BlogCard";
 
 type FeedProps = {
@@ -20,7 +19,6 @@ const Feed = ({ loading, blogs, handleClick }: FeedProps) => {
           <BlogCardSkeleton />
           <BlogCardSkeleton />
           <BlogCardSkeleton />
-          <Spinner />
         </div>
       ) : (
         blogs.map((blog: BlogT) => {

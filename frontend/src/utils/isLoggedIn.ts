@@ -22,7 +22,7 @@ export const isLoggedIn = () => {
     console.log(user);
 
     const { setUser } = useUserStore.getState();
-    const { setIsLoggedIn } = useAppStore.getState();
+    const setIsLoggedIn = useAppStore.getState().setIsLoggedIn;
 
     setUser(user);
     setIsLoggedIn(true);

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { create } from "zustand";
 
 // model Blog {
@@ -17,7 +16,7 @@ import { create } from "zustand";
 //   Reactions Reactions[]
 // }
 
-type BlogT = {
+type Blog = {
   blogId: string;
   title: string;
   content: string;
@@ -25,12 +24,14 @@ type BlogT = {
   reactions: number;
   createdAt: Date;
 };
+type Feed = {
+  following: Blog[];
+  global: Blog[];
+};
 
-export const useAppStore = create<BlogT>((set) => ({
-  blogId: "123",
-  title: "123",
-  content: "124",
-  authorId: "123",
-  reactions: 123,
-  createdAt: new Date(Date.now()),
-}));
+export const useBlogStore = create<Feed[]>(() => [
+  {
+    following: [],
+    global: [],
+  },
+]);

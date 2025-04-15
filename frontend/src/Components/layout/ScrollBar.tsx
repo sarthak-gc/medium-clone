@@ -15,7 +15,7 @@ const ScrollBar = () => {
       <div className="flex gap-10 overflow-x-auto px-4 scrollbar-none relative z-0">
         <Link
           className="flex-shrink-0 px-4 py-2 rounded w-1/6 text-start "
-          to={"/global"}
+          to={"/"}
         >
           For You
         </Link>
@@ -28,25 +28,25 @@ const ScrollBar = () => {
 
         <Link
           className="flex-shrink-0 px-4 py-2 rounded w-1/6 text-start "
-          to={"/random"}
+          to={"/random/coding"}
         >
           Coding
         </Link>
         <Link
           className="flex-shrink-0 px-4 py-2 rounded w-1/6 text-start "
-          to={"/random"}
+          to={"/random/featured"}
         >
           Featured
         </Link>
         <Link
           className="flex-shrink-0 px-4 py-2 rounded w-1/6 text-start "
-          to={"/random"}
+          to={"/random/technology"}
         >
           Technology
         </Link>
         <Link
           className="flex-shrink-0 px-4 py-2 rounded w-1/6 text-start "
-          to={"/random"}
+          to={"/random/data-science"}
         >
           Data Science
         </Link>

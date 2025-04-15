@@ -146,10 +146,22 @@ export const getBlog = async (c: Context) => {
     },
   });
 };
-
 export const getGlobalFeed = async (c: Context) => {
   const prisma = getPrisma(c);
+  let startFrom = c.req.query("startFrom");
+  console.log(startFrom, " OUTSIDE");
+
+  if (!startFrom) {
+    startFrom = "0";
+  }
+  if (isNaN(parseInt(startFrom))) {
+    console.log(startFrom, "Start from");
+
+    startFrom = "0";
+  }
   const blogs = await prisma.blog.findMany({
+    skip: parseInt(startFrom),
+    take: 8,
     where: {
       visibility: "PUBLIC",
       isDeleted: false,

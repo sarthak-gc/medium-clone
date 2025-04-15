@@ -121,6 +121,7 @@ const Login = () => {
 
     try {
       setIsLoading(true);
+      console.log(AXIOS);
       const response = await AXIOS.post("user/signin", {
         username: formData.username,
         password: formData.password,
@@ -132,7 +133,7 @@ const Login = () => {
 
       setIsLoggedIn(true);
 
-      navigate("/global");
+      navigate("/");
     } catch (e) {
       if (e instanceof AxiosError) alert(e.response?.data.message);
     } finally {

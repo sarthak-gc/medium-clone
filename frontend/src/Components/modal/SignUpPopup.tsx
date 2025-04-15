@@ -1,20 +1,10 @@
 import { Link } from "react-router-dom";
 
-const SignUpPopup = ({
-  popUp,
-}: {
-  popUp: boolean;
-  setPopUp: (val: boolean) => void;
-}) => {
+const SignUpPopup = ({ popUp }: { popUp: boolean }) => {
   if (!popUp) return null;
 
   return (
-    <div
-      onClick={() => {
-        // setPopUp(false);
-      }}
-      className="fixed inset-0  bg-opacity-50 flex items-center justify-center  px-4 "
-    >
+    <div className="fixed inset-0  bg-opacity-50 flex items-center justify-center  px-4 ">
       <div className="rounded-lg p-8 max-w-md w-full space-y-6 shadow-lg bg-[#f2f1ed]">
         <h2 className="text-2xl font-bold text-center">Join Medium.</h2>
 

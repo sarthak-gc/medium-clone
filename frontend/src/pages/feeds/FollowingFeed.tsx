@@ -23,7 +23,7 @@ const FollowingFeed = () => {
   }, []);
 
   const handleClick = (id: string) => {
-    navigate(`/blog/${id}`);
+    navigate(`/blog/${id}/read`);
   };
 
   return (
