@@ -7,7 +7,7 @@ type ProtectedRouteP = {
 };
 const ProtectedRoute = ({ children }: ProtectedRouteP) => {
   if (!isLoggedIn()) {
-    return <Navigate to="/home" replace />;
+    return <Navigate to="/unauthorized" replace />;
   }
   return children;
 };

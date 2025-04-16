@@ -13,6 +13,10 @@ import NotFound from "./pages/extra/NotFound";
 import GlobalFeed from "./pages/feeds/GlobalFeed";
 import Random from "./pages/blog/Random";
 import FollowingFeed from "./pages/feeds/FollowingFeed";
+import SearchedBlogResults from "./pages/search/SearchedBlogResults";
+import SearchedUserResults from "./pages/search/SearchedUserResults";
+import Unauthorized from "./pages/extra/Unauthorized";
+import Reactions from "./pages/blog/Interactions/Reactions";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -53,17 +57,33 @@ const App = () => {
         </ProtectedRoute>
       ),
     },
-    // {
-    //   path: "/blog",
-    //   element: (
-    //     <ProtectedRoute>
-    //       <>
-    //         <Navbar />
-    //         <Writeblog />
-    //       </>
-    //     </ProtectedRoute>
-    //   ),
-    // },
+    {
+      path: "/search",
+      children: [
+        {
+          path: "blogs",
+          element: (
+            <ProtectedRoute>
+              <>
+                <Navbar />
+                <SearchedBlogResults />
+              </>
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "users",
+          element: (
+            <ProtectedRoute>
+              <>
+                <Navbar />
+                <SearchedUserResults />
+              </>
+            </ProtectedRoute>
+          ),
+        },
+      ],
+    },
 
     {
       path: "/blog",
@@ -81,10 +101,23 @@ const App = () => {
         {
           path: ":blogId/read",
           element: (
-            <>
-              <Navbar />
-              <ReadBlog />
-            </>
+            <ProtectedRoute>
+              <>
+                <Navbar />
+                <ReadBlog />
+              </>
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: ":blogId/reactions",
+          element: (
+            <ProtectedRoute>
+              <>
+                <Navbar />
+                <Reactions />
+              </>
+            </ProtectedRoute>
           ),
         },
         {
@@ -100,17 +133,19 @@ const App = () => {
       ],
     },
     {
+      path: "/unauthorized",
+      element: <Unauthorized />,
+    },
+    {
       path: "/",
       children: [
         {
           path: "",
           element: (
-            <ProtectedRoute>
-              <>
-                <Navbar />
-                <GlobalFeed />
-              </>
-            </ProtectedRoute>
+            <>
+              <Navbar />
+              <GlobalFeed />
+            </>
           ),
         },
         {

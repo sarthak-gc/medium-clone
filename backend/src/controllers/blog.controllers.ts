@@ -31,7 +31,12 @@ export const createBlog = async (c: Context) => {
   const userDetails = c.get("userDetails");
   const { title, content } = body;
   let { visibility = "" } = body;
-
+  if (!title.trim() || !content.trim()) {
+    return c.json({
+      status: "error",
+      message: "Title and content cannot be empty",
+    });
+  }
   try {
     visibility = getValidVisibility(c, visibility, userDetails.profile);
     const prisma = getPrisma(c);
@@ -48,7 +53,7 @@ export const createBlog = async (c: Context) => {
       status: "success",
       message: "Blog Added Successfully",
       data: {
-        blogAdded,
+        blog: blogAdded,
       },
     });
   } catch (e) {
@@ -102,8 +107,15 @@ export const commentOnBlog = async (c: Context) => {
   }
 
   const prisma = getPrisma(c);
-  addComment(prisma, blogId, userId, comment);
-  return c.json({ status: "success", message: "Comment posted" });
+
+  const commentDetails = await addComment(prisma, blogId, userId, comment);
+  return c.json({
+    status: "success",
+    message: "Comment posted",
+    data: {
+      commentDetails,
+    },
+  });
 };
 
 export const replyToComment = async (c: Context) => {
@@ -455,6 +467,13 @@ export const getReactions = async (c: Context) => {
     where: {
       blogId,
     },
+    include: {
+      User: {
+        select: {
+          username: true,
+        },
+      },
+    },
   });
   return c.json({
     reactions,
@@ -505,7 +524,7 @@ export const searchBlogs = async (c: Context) => {
   const userDetails = c.get("userDetails");
 
   const prisma = getPrisma(c);
-
+  console.log(startFrom, query);
   const blogs = await prisma.blog.findMany({
     skip: startFrom,
     take: 5,
@@ -516,14 +535,50 @@ export const searchBlogs = async (c: Context) => {
         },
         { content: { contains: query } },
       ],
-      NOT: { authorId: userDetails.userId },
+      // NOT: { authorId: userDetails.userId },
     },
     orderBy: {
       reactions: "desc",
     },
+    include: {
+      User: {
+        select: {
+          userId: true,
+          username: true,
+        },
+      },
+      Comment: {
+        select: {
+          createdAt: true,
+          isUpdated: true,
+          parentId: true,
+          commentId: true,
+          User: {
+            select: {
+              username: true,
+            },
+          },
+          content: true,
+        },
+      },
+      Reactions: {
+        select: {
+          createdAt: true,
+          User: {
+            select: {
+              username: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   return c.json({
-    blogs,
+    status: "success",
+    message: blogs.length === 0 ? "No blog found" : "Blogs retrieved",
+    data: {
+      blogs,
+    },
   });
 };

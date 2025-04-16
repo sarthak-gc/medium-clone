@@ -95,11 +95,18 @@ export const addComment = async (
   userId: string,
   comment: string
 ) => {
-  await prisma.comment.create({
+  return await prisma.comment.create({
     data: {
       content: comment,
       blogId,
       commenterId: userId,
+    },
+    include: {
+      User: {
+        select: {
+          username: true,
+        },
+      },
     },
   });
 };
@@ -128,6 +135,38 @@ export const findBlog = async (prisma: PrismaClient, blogId: string) => {
     where: {
       blogId,
       isDeleted: false,
+    },
+    include: {
+      User: {
+        select: {
+          username: true,
+          userId: true,
+        },
+      },
+      Comment: {
+        select: {
+          createdAt: true,
+          isUpdated: true,
+          parentId: true,
+          commentId: true,
+          User: {
+            select: {
+              username: true,
+            },
+          },
+          content: true,
+        },
+      },
+      Reactions: {
+        select: {
+          createdAt: true,
+          User: {
+            select: {
+              username: true,
+            },
+          },
+        },
+      },
     },
   });
   return blog;

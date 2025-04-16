@@ -15,7 +15,7 @@ const FollowingFeed = () => {
       const response = await AXIOS.get(`/blog/followings`, {
         // withCredentials: true,
       });
-      console.log(response);
+      // console.log(response);
       setBlogs(response.data.data.blogs);
       setLoading(false);
     };
@@ -23,7 +23,12 @@ const FollowingFeed = () => {
   }, []);
 
   const handleClick = (id: string) => {
-    navigate(`/blog/${id}/read`);
+    const blogDetails = blogs.filter((blog) => blog.blogId === id);
+    navigate(`/blog/${id}/read`, {
+      state: {
+        blogDetails: blogDetails[0],
+      },
+    });
   };
 
   return (

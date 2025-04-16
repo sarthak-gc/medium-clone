@@ -169,7 +169,7 @@ const Register = () => {
     try {
       setIsLoading(true);
       // const theme = useAppStore.getState().darkTheme;
-      // console.log(theme);
+      // // console.log(theme);
       const response = await AXIOS.post("user/signup", {
         username: formData.username,
         password: formData.password,

@@ -79,7 +79,7 @@ const Home = () => {
           </p>
           <button
             onClick={() => {
-              setPopUp(true);
+              navigate("/");
             }}
             className="bg-green-700 text-white px-5 py-2 rounded-full hover:bg-green-800 transition cursor-pointer"
           >

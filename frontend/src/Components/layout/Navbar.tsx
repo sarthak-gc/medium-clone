@@ -1,27 +1,50 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAppStore } from "../../store/appStore";
+import { ChangeEvent, useState } from "react";
 
 const Navbar = () => {
+  const [query, setQuery] = useState<string>();
   const isLoggedIn = useAppStore().isLoggedIn;
+  const setQueryS = useAppStore().setQuery;
   const navigate = useNavigate();
-
   const handleBlogWrite = () => {
-    navigate("/write");
+    navigate("/blog/write");
   };
 
-  console.log(isLoggedIn);
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value.trim());
+    setQueryS(e.target.value);
+  };
+
+  const handleBlogSearch = async () => {
+    navigate(`/search/blogs?q=${query}`, {
+      state: {
+        fromNav: true,
+        pathname: location.pathname,
+      },
+    });
+  };
 
   return (
-    <nav className="w-full border-b border-gray-200 px-4 py-3 bg-white">
+    <nav className="w-full border-b border-gray-200 px-4 py-4 md:py-3 bg-white">
       {/* Desktop and Large screens: Logo, Search, Buttons, and Avatar */}
       <div className="hidden md:flex justify-between items-center">
         {/* Left Section: Logo + Search */}
         <div className="flex items-center gap-6">
-          <h1 className="text-2xl font-bold text-gray-900 cursor-pointer">
+          <Link
+            to="/"
+            className="text-2xl font-bold text-gray-900 cursor-pointer"
+          >
             Medium Rare
-          </h1>
+          </Link>
 
           <input
+            onChange={handleSearchChange}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                if (query) handleBlogSearch();
+              }
+            }}
             type="search"
             placeholder="Search"
             className="px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black bg-[#f9f9f9]"
@@ -94,10 +117,13 @@ const Navbar = () => {
       {/* Mobile: Logo, SignIn/SignUp at top, Search bar + Avatar below */}
       <div className="md:hidden">
         {/* Top Section: Logo + Auth Buttons */}
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold text-gray-900 cursor-pointer">
+        <div className="flex justify-between items-center">
+          <Link
+            to="/"
+            className="text-2xl font-bold text-gray-900 cursor-pointer"
+          >
             Medium Rare
-          </h1>
+          </Link>
 
           <div className="flex items-center gap-4">
             <div
@@ -158,11 +184,12 @@ const Navbar = () => {
         </div>
 
         {/* Bottom Section: Search bar + Avatar */}
-        <div className="flex items-center gap-4 justify-between">
+        <div className="flex items-center gap-4 justify-between mt-3">
           <input
             type="search"
             placeholder="Search"
-            className="w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
+            className="w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black bg-[#f9f9f9]
+            "
           />
         </div>
       </div>

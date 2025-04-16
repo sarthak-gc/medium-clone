@@ -49,9 +49,9 @@ const GlobalFeed = () => {
       if (!noMore) {
         setFetching(true);
         const response = await AXIOS.get(`/blog/public?startFrom=${startFrom}`);
-        console.log(response.data.data.blogs[0]);
+        // console.log(response.data.data.blogs[0]);
         if (response.data.data.blogs.length === 0) {
-          console.log("EMPTY RESPONSE");
+          // console.log("EMPTY RESPONSE");
           setNoMore(true);
         }
         // setBlogs((prev) => [...prev, ...response.data.data.blogs]);
@@ -98,11 +98,17 @@ const GlobalFeed = () => {
     };
   }, [fetching, noMore]);
   const handleClick = (id: string) => {
-    navigate(`/blog/${id}/read`);
+    const blogDetails = blogs.filter((blog) => blog.blogId === id);
+    navigate(`/blog/${id}/read`, {
+      state: {
+        blogDetails: blogDetails[0],
+      },
+    });
   };
 
   return (
     <div
+      className="px-4"
       onClick={() => {
         if (!noMore) setStartFrom((prev) => prev + 5);
       }}
@@ -115,11 +121,6 @@ const GlobalFeed = () => {
       )}
       <Feed handleClick={handleClick} loading={loading} blogs={blogs} />
       {fetching && <Spinner />}
-      {noMore && (
-        <div className="max-w-3xl mx-auto p-12  cursor-pointer text-center ">
-          Looks like you've reached the end of the databases
-        </div>
-      )}
     </div>
   );
 };

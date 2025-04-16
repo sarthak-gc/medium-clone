@@ -465,7 +465,7 @@ export const searchUser = async (c: Context) => {
       message: "Invalid starting index",
     });
   }
-  const take = 10;
+
   if (!query) {
     return c.json({
       status: "error",
@@ -479,18 +479,31 @@ export const searchUser = async (c: Context) => {
 
   const users = await prisma.user.findMany({
     skip: startFrom,
-    take,
+    take: 10,
 
     where: {
       username: {
         contains: query,
       },
+      isDeleted: false,
+      profile: "PUBLIC",
       NOT: { username: userDetails.username },
+    },
+    select: {
+      email: true,
+      profile: true,
+      profilePic: true,
+      userId: true,
+      username: true,
     },
   });
 
   return c.json({
-    users,
+    status: "success",
+    message: "",
+    data: {
+      users,
+    },
   });
 };
 
