@@ -1,15 +1,17 @@
 const Like = ({
   count,
-  setShowReactionOptions,
+  toggleReactionOptions,
+  showReactionList,
 }: {
   count: number;
-  setShowReactionOptions?: (val: boolean) => void;
+  toggleReactionOptions: () => void;
+  showReactionList: () => void;
 }) => {
   return (
     <span className="flex gap-1 items-center">
       <svg
         onClick={() => {
-          setShowReactionOptions((prev) => !prev);
+          toggleReactionOptions();
         }}
         xmlns="http://www.w3.org/2000/svg"
         width="16"
@@ -24,7 +26,13 @@ const Like = ({
           clipRule="evenodd"
         ></path>
       </svg>
-      <span>{count}</span>
+      <span
+        onClick={() => {
+          showReactionList();
+        }}
+      >
+        {count}
+      </span>
     </span>
   );
 };

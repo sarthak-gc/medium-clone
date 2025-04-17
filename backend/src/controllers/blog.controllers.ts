@@ -239,7 +239,6 @@ export const getFollowingFeed = async (c: Context) => {
     where: {
       isDeleted: false,
       visibility: "PUBLIC",
-
       authorId: {
         in: followIds,
       },
@@ -250,6 +249,35 @@ export const getFollowingFeed = async (c: Context) => {
       content: true,
       authorId: true,
       reactions: true,
+      Comment: {
+        select: {
+          createdAt: true,
+          isUpdated: true,
+          parentId: true,
+          commentId: true,
+          User: {
+            select: {
+              username: true,
+            },
+          },
+          content: true,
+        },
+      },
+      User: {
+        select: {
+          username: true,
+        },
+      },
+      Reactions: {
+        select: {
+          User: {
+            select: {
+              userId: true,
+              username: true,
+            },
+          },
+        },
+      },
     },
     orderBy: {
       reactions: "desc",
@@ -435,7 +463,7 @@ export const getBlogComments = async (c: Context) => {
   });
 
   const comments = await getComments(prisma, blogId);
-
+  console.log(comments," HIHI");
   if (isFollowing) {
     return c.json({
       status: "success",

@@ -1,13 +1,22 @@
+import { useNavigate } from "react-router-dom";
+
 type AvatarNameProp = {
   username: string;
-  createdAt: Date;
+  createdAt?: Date;
   small: boolean;
+  id: string;
 };
-const AvatarName = ({ username, createdAt, small }: AvatarNameProp) => {
+const AvatarName = ({ username, createdAt, small, id }: AvatarNameProp) => {
+  const navigate = useNavigate();
+  const handleProfileClick = (id: string) => {
+    console.log("User clicked");
+    navigate(`/user/${id}`);
+  };
   return (
     <div
       className={`flex items-center space-x-3   h-12
       }`}
+      onClick={() => handleProfileClick(id)}
     >
       <div
         className={`   ${
@@ -16,16 +25,18 @@ const AvatarName = ({ username, createdAt, small }: AvatarNameProp) => {
       >
         {username[0] && username[0].toUpperCase()}
       </div>
-      <div className={`flex flex-col   `}>
+      <div className={`flex flex-col`}>
         <h2 className="text-sm font-semibold text-gray-800">
           {username[0] && username[0].toUpperCase() + username.slice(1)}
         </h2>
-        <span>
-          {new Date(createdAt).toLocaleString("en-US", {
-            month: "short",
-            day: "numeric",
-          })}
-        </span>
+        {createdAt && (
+          <span>
+            {new Date(createdAt).toLocaleString("en-US", {
+              month: "short",
+              day: "numeric",
+            })}
+          </span>
+        )}
       </div>
     </div>
   );

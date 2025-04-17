@@ -33,7 +33,7 @@ const RegisterForm = ({
         type="submit"
         value={isLoading ? "Registering..." : "Register"}
         className={`w-full text-white py-2 rounded-full  transition ${
-          isLoading ? "bg-gray-400" : " bg-black"
+          isLoading ? "bg-gray-400 cursor-not-allowed" : " bg-black "
         }`}
         disabled={isLoading}
       />

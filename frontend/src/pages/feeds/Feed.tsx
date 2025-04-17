@@ -5,10 +5,9 @@ import BlogCard from "../../Components/blog/BlogCard";
 type FeedProps = {
   loading: boolean;
   blogs: BlogT[];
-  handleClick: (id: string) => void;
 };
 
-const Feed = ({ loading, blogs, handleClick }: FeedProps) => {
+const Feed = ({ loading, blogs }: FeedProps) => {
   return (
     <>
       {loading ? (
@@ -22,9 +21,7 @@ const Feed = ({ loading, blogs, handleClick }: FeedProps) => {
         </div>
       ) : (
         blogs.map((blog: BlogT) => {
-          return (
-            <BlogCard handleClick={handleClick} key={blog.blogId} blog={blog} />
-          );
+          return <BlogCard key={blog.blogId} blog={blog} />;
         })
       )}
     </>

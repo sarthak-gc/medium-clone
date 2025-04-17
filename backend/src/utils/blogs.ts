@@ -151,6 +151,7 @@ export const findBlog = async (prisma: PrismaClient, blogId: string) => {
           commentId: true,
           User: {
             select: {
+              userId: true,
               username: true,
             },
           },

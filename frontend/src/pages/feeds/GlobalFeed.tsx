@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AXIOS } from "../../utils/axios";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import Feed from "./Feed";
 import ScrollBar from "../../Components/layout/ScrollBar";
 import Spinner from "../../Components/loaders/Spinner";
@@ -12,6 +12,7 @@ export type CommentT = {
   commentId: string;
   User: {
     username: string;
+    userId: string;
   };
   content: string;
 };
@@ -39,7 +40,7 @@ const GlobalFeed = () => {
   const [blogs, setBlogs] = useState<BlogT[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetching, setFetching] = useState(false);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [startFrom, setStartFrom] = useState(0);
   const [noMore, setNoMore] = useState(false);
 
@@ -97,14 +98,6 @@ const GlobalFeed = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, [fetching, noMore]);
-  const handleClick = (id: string) => {
-    const blogDetails = blogs.filter((blog) => blog.blogId === id);
-    navigate(`/blog/${id}/read`, {
-      state: {
-        blogDetails: blogDetails[0],
-      },
-    });
-  };
 
   return (
     <div
@@ -119,7 +112,7 @@ const GlobalFeed = () => {
           No Blogs In the home feed
         </div>
       )}
-      <Feed handleClick={handleClick} loading={loading} blogs={blogs} />
+      <Feed loading={loading} blogs={blogs} />
       {fetching && <Spinner />}
     </div>
   );

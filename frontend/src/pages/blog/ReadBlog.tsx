@@ -67,6 +67,7 @@ const ReadBlog = () => {
       commentId: commentDetails.commentId,
       User: {
         username: commentDetails.User.username,
+        userId: commentDetails.User.userId,
       },
       content: comment,
     });
@@ -81,6 +82,9 @@ const ReadBlog = () => {
     setShowReactionOptions(false);
   };
 
+  const toggleReactionOptions = () => {
+    setShowReactionOptions((prev) => !prev);
+  };
   useEffect(() => {
     adjustHeight();
   }, [comment]);
@@ -95,6 +99,7 @@ const ReadBlog = () => {
       <div className="flex items-center space-x-3 my-8 h-12 ">
         <AvatarName
           username={blogDetails.User.username}
+          id={blogDetails.authorId}
           createdAt={blogDetails.createdAt}
           small={false}
         />
@@ -107,7 +112,7 @@ const ReadBlog = () => {
           <ul className="flex space-x-4  p-4 rounded-lg absolute -top-10 -left-10 ">
             <li className="relative group">
               <button
-                className="p-2 bg-red-600 rounded-full text-white"
+                className="p-2 rounded-full text-white"
                 onClick={() => setReaction("Heart", blogDetails.blogId)}
               >
                 ❤️
@@ -167,10 +172,10 @@ const ReadBlog = () => {
           </ul>
         )}
         <Like
-          setShowReactionList={() => {
+          showReactionList={() => {
             navigate(`/blog/${blogId}/reactions`);
           }}
-          setShowReactionOptions={setShowReactionOptions}
+          toggleReactionOptions={toggleReactionOptions}
           count={blogDetails.Reactions.length}
         />
         <Comment count={blogDetails.Comment.length} />
@@ -183,6 +188,7 @@ const ReadBlog = () => {
         <div key={comment.commentId} className="border-t border-gray-300 py-4">
           <AvatarName
             username={comment.User.username}
+            id={comment.User.userId}
             createdAt={comment.createdAt}
             small={true}
           />

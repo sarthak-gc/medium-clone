@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { AXIOS } from "../../utils/axios";
-import { useNavigate } from "react-router-dom";
 import { BlogT } from "./GlobalFeed";
 import ScrollBar from "../../Components/layout/ScrollBar";
 import Feed from "./Feed";
@@ -8,7 +7,7 @@ import Feed from "./Feed";
 const FollowingFeed = () => {
   const [blogs, setBlogs] = useState<BlogT[]>([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+
   // const { blogId } = useParams();
   useEffect(() => {
     const fetchBlog = async () => {
@@ -22,15 +21,6 @@ const FollowingFeed = () => {
     fetchBlog();
   }, []);
 
-  const handleClick = (id: string) => {
-    const blogDetails = blogs.filter((blog) => blog.blogId === id);
-    navigate(`/blog/${id}/read`, {
-      state: {
-        blogDetails: blogDetails[0],
-      },
-    });
-  };
-
   return (
     <div className="px-4">
       <ScrollBar />
@@ -39,7 +29,7 @@ const FollowingFeed = () => {
           No Blogs From Your Followings
         </div>
       )}
-      <Feed handleClick={handleClick} loading={loading} blogs={blogs} />
+      <Feed loading={loading} blogs={blogs} />
     </div>
   );
 };

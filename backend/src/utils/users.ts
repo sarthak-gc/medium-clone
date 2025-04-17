@@ -202,24 +202,84 @@ export const getFollowing = async (prisma: PrismaClient, userId: string) => {
 
 export const getPostsForFollower = async (
   prisma: PrismaClient,
-  authorId: string
+  authorId: string,
+  startFrom?: number
 ) => {
   const userBlogs = await prisma.blog.findMany({
     where: {
       authorId,
       OR: [{ visibility: "PRIVATE" }, { visibility: "PUBLIC" }],
     },
+    select: {
+      blogId: true,
+      title: true,
+      content: true,
+      authorId: true,
+      createdAt: true,
+
+      User: {
+        select: { username: true },
+      },
+      Reactions: {
+        select: {
+          User: {
+            select: { username: true },
+          },
+        },
+      },
+
+      Comment: {
+        select: {
+          User: {
+            select: {
+              username: true,
+            },
+          },
+        },
+      },
+    },
   });
   return userBlogs;
 };
 export const getPostsForPublic = async (
   prisma: PrismaClient,
-  authorId: string
+  authorId: string,
+  startFrom?: number
 ) => {
   const userBlogs = await prisma.blog.findMany({
+    skip: startFrom,
+    take: 5,
     where: {
       authorId,
       visibility: "PUBLIC",
+    },
+    select: {
+      blogId: true,
+      title: true,
+      content: true,
+      authorId: true,
+      createdAt: true,
+
+      User: {
+        select: { username: true },
+      },
+      Reactions: {
+        select: {
+          User: {
+            select: { username: true },
+          },
+        },
+      },
+
+      Comment: {
+        select: {
+          User: {
+            select: {
+              username: true,
+            },
+          },
+        },
+      },
     },
   });
   return userBlogs;

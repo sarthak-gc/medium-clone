@@ -17,6 +17,7 @@ import SearchedBlogResults from "./pages/search/SearchedBlogResults";
 import SearchedUserResults from "./pages/search/SearchedUserResults";
 import Unauthorized from "./pages/extra/Unauthorized";
 import Reactions from "./pages/blog/Interactions/Reactions";
+import UserProfile from "./pages/user/UserProfile";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -135,6 +136,17 @@ const App = () => {
     {
       path: "/unauthorized",
       element: <Unauthorized />,
+    },
+    {
+      path: "/user/:userId",
+      element: (
+        <ProtectedRoute>
+          <>
+            <Navbar />
+            <UserProfile />
+          </>
+        </ProtectedRoute>
+      ),
     },
     {
       path: "/",

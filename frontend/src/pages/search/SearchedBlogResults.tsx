@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { AXIOS } from "../../utils/axios";
 import { BlogT } from "../feeds/GlobalFeed";
 import BlogCardSkeleton from "../../Components/skeleton/BlogCardSkeleton";
@@ -12,10 +12,7 @@ const SearchedBlogResults = () => {
   const [isSearchDataLoading, setIsSearchDataLoading] = useState<boolean>(true);
   const [isMoreDataLoading, setIsMoreDataLoading] = useState<boolean>(true);
   const [fetching, setFetching] = useState<boolean>(false);
-  const navigate = useNavigate();
-  const handleClick = (id: string) => {
-    navigate(`/blog/${id}/read`);
-  };
+
   const location = useLocation();
 
   const [results, setResults] = useState<BlogT[]>([]);
@@ -105,9 +102,7 @@ const SearchedBlogResults = () => {
         </ul>
       )}
       {results.map((blog) => {
-        return (
-          <BlogCard key={blog.blogId} blog={blog} handleClick={handleClick} />
-        );
+        return <BlogCard key={blog.blogId} blog={blog} />;
       })}
 
       {fetching && !isMoreDataLoading && <Spinner />}

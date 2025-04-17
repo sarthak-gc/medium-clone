@@ -108,6 +108,16 @@ export const signIn = async (c: Context) => {
 export const getProfile = async (c: Context) => {
   const { profileId } = c.req.param();
 
+  let startFrom = c.req.query("startFrom");
+
+  if (!startFrom) {
+    startFrom = "0";
+  }
+  if (isNaN(parseInt(startFrom))) {
+    startFrom = "0";
+  }
+  console.log("hi", startFrom);
+
   const userDetails = c.get("userDetails");
 
   if (!profileId) {
@@ -151,9 +161,17 @@ export const getProfile = async (c: Context) => {
     if (userInfo.profile === "PUBLIC") {
       // if follows let them see all, if doesn't follow then just public posts
       if (isFollowing) {
-        userBlogs = await getPostsForFollower(prisma, profileId);
+        userBlogs = await getPostsForFollower(
+          prisma,
+          profileId,
+          parseInt(startFrom)
+        );
       } else {
-        userBlogs = await getPostsForPublic(prisma, profileId);
+        userBlogs = await getPostsForPublic(
+          prisma,
+          profileId,
+          parseInt(startFrom)
+        );
       }
     }
 
@@ -316,6 +334,13 @@ export const getSelfFollowing = async (c: Context) => {
   const followings = await prisma.follow.findMany({
     where: {
       followerId: userId,
+    },
+    include: {
+      Following: {
+        select: {
+          username: true,
+        },
+      },
     },
   });
 
