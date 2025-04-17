@@ -155,7 +155,11 @@ export const getProfile = async (c: Context) => {
           status: "error",
           message: "Follow the person to view their profile",
         });
-      userBlogs = await getPostsForFollower(prisma, profileId);
+      userBlogs = await getPostsForFollower(
+        prisma,
+        profileId,
+        parseInt(startFrom)
+      );
     }
 
     if (userInfo.profile === "PUBLIC") {
@@ -180,6 +184,7 @@ export const getProfile = async (c: Context) => {
       message: "User Info received",
       data: {
         blogs: userBlogs,
+        userInfo,
       },
     });
   } catch (e) {

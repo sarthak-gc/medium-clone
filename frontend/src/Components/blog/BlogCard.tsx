@@ -32,7 +32,7 @@ const BlogCard = ({ blog }: BlogCardProp) => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto  border-b border-gray-200 p-5 px-0 cursor-pointer flex gap-12 bg-amber-50 ">
+    <div className="max-w-3xl mx-auto  border-b border-gray-200 p-5 px-0 cursor-pointer flex gap-12  ">
       <div className="w-3/4 flex-flex-col ">
         {/* Header: Author */}
         <div className="flex items-center  space-x-3 mb-4 h-6  w-fit z-0">

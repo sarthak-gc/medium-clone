@@ -28,7 +28,7 @@ const ReadBlog = () => {
   const { blogDetails: blog } = location.state || {};
   const [showReactionOptions, setShowReactionOptions] =
     useState<boolean>(false);
-
+  const [sending, setSending] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const navigate = useNavigate();
   useEffect(() => {
@@ -54,11 +54,14 @@ const ReadBlog = () => {
     }
   };
   const handleCommentSend = async (blogId: string) => {
+    setSending(true);
     const response = await AXIOS.post(`/blog/${blogId}/comment`, {
       comment,
     });
-    const commentDetails = response.data.data.commentDetails;
+    setSending(false);
 
+    const commentDetails = response.data.data.commentDetails;
+    console.log(sending, " Comment sending....");
     setComment("");
     blogDetails.Comment.push({
       createdAt: new Date(commentDetails.createdAt),
@@ -105,9 +108,11 @@ const ReadBlog = () => {
         />
       </div>
 
-      <div className="text-[#353535]">{blogDetails.content}</div>
+      <div className="text-[#353535]  whitespace-pre-line">
+        {blogDetails.content}
+      </div>
 
-      <div className="flex  text-xs text-gray-500  pt-3 mt-3 gap-4 h-6 mb-12 relative ">
+      {/* <div className="flex  text-xs text-gray-500  pt-3 mt-3 gap-4 h-6 mb-12 relative ">
         {showReactionOptions && (
           <ul className="flex space-x-4  p-4 rounded-lg absolute -top-10 -left-10 ">
             <li className="relative group">
@@ -179,7 +184,96 @@ const ReadBlog = () => {
           count={blogDetails.Reactions.length}
         />
         <Comment count={blogDetails.Comment.length} />
+      </div> */}
+
+      <div className="flex text-xs text-gray-500 pt-3 mt-3 gap-4 h-6 mb-12 relative">
+        {showReactionOptions && (
+          <ul className="flex space-x-4 p-4 rounded-lg absolute -top-10 -left-10">
+            {[
+              {
+                icon: "❤️",
+                label: "Heart",
+                bgColor: "bg-red-500",
+                action: "Heart",
+              },
+              {
+                icon: "👍",
+                label: "Like",
+                bgColor: "bg-blue-600",
+                action: "Like",
+              },
+              {
+                icon: "😂",
+                label: "Laugh",
+                bgColor: "bg-yellow-600",
+                action: "Laugh",
+              },
+              {
+                icon: "😡",
+                label: "Angry",
+                bgColor: "bg-orange-600",
+                action: "Angry",
+              },
+              {
+                icon: "👎",
+                label: "Dislike",
+                bgColor: "bg-gray-600",
+                action: "Dislike",
+              },
+            ].map(({ icon, label, bgColor, action }) => (
+              <li className="relative group" key={action}>
+                <button
+                  className={`p-3 rounded-full text-white ${bgColor} transform transition-transform duration-300 ease-in-out hover:scale-110 active:scale-90`}
+                  onClick={() => {
+                    const emoji = document.querySelector(`#emoji-${action}`);
+                    emoji.classList.add("shatter");
+
+                    setTimeout(() => {
+                      toggleReactionOptions();
+                      setReaction(action, blogDetails.blogId);
+                    }, 300);
+                  }}
+                  id={`emoji-${action}`}
+                >
+                  {icon}
+                </button>
+                <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 text-sm text-white bg-black rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
+                  {label}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+        <Like
+          showReactionList={() => {
+            navigate(`/blog/${blogId}/reactions`);
+          }}
+          toggleReactionOptions={toggleReactionOptions}
+          count={blogDetails.Reactions.length}
+        />
+        <Comment count={blogDetails.Comment.length} />
       </div>
+
+      <style jsx>{`
+        @keyframes shatter {
+          0% {
+            transform: scale(1) rotate(0deg);
+            opacity: 1;
+          }
+          50% {
+            transform: scale(1.5);
+            opacity: 0.7;
+          }
+          100% {
+            transform: scale(0);
+            opacity: 0;
+          }
+        }
+
+        .shatter {
+          animation: shatter 0.5s forwards;
+        }
+      `}</style>
 
       <h1 className="text-2xl font-bold mb-3">Comments</h1>
 
@@ -211,9 +305,11 @@ const ReadBlog = () => {
           <button
             onClick={() => handleCommentSend(blogDetails.blogId)}
             className={` px-6 py-2 text-sm text-white rounded-full ${
-              comment.trim().length > 0 ? "bg-black" : "bg-[#dbdbdb]"
+              !sending && comment.length > 0
+                ? "bg-black cursor-pointer"
+                : "bg-[#dbdbdb] cursor-not-allowed"
             }`}
-            disabled={comment.trim().length === 0}
+            disabled={sending}
           >
             Respond
           </button>

@@ -45,6 +45,7 @@ const Navbar = () => {
                 if (query) handleBlogSearch();
               }
             }}
+            value={query}
             type="search"
             placeholder="Search"
             className="px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black bg-[#f9f9f9]"
@@ -186,10 +187,17 @@ const Navbar = () => {
         {/* Bottom Section: Search bar + Avatar */}
         <div className="flex items-center gap-4 justify-between mt-3">
           <input
+            onChange={handleSearchChange}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                if (query) handleBlogSearch();
+              }
+            }}
             type="search"
             placeholder="Search"
             className="w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black bg-[#f9f9f9]
             "
+            value={query}
           />
         </div>
       </div>

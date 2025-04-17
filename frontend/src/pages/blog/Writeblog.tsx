@@ -27,7 +27,7 @@ const Writeblog = () => {
       setIsPublished(true);
       setTimeout(() => {
         navigate(`/blog/${response.data.data.blog.blogId}/read`);
-      }, 1000);
+      }, 100);
     } catch (e) {
       console.log(e);
     } finally {

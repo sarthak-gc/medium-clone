@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { AXIOS } from "../../utils/axios";
 
 import Header from "./Header";
@@ -18,12 +18,12 @@ const SearchedUserResults = () => {
   const [isUserLoading, setIsUserLoading] = useState<boolean>(true);
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [noMore, setNoMore] = useState(false);
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleClick = (id: string) => {
     console.log("User clicked");
     console.log(id);
-    // navigate("/following");
+    navigate(`/user/${id}`);
   };
   const followUser = async (id: string) => {
     console.log(id);

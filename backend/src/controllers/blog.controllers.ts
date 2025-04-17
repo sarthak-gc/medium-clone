@@ -231,11 +231,25 @@ export const getFollowingFeed = async (c: Context) => {
   const { userId } = c.get("user");
   const prisma = getPrisma(c);
 
+  let startFrom = c.req.query("startFrom");
+  console.log(startFrom, " OUTSIDE");
+
+  if (!startFrom) {
+    startFrom = "0";
+  }
+  if (isNaN(parseInt(startFrom))) {
+    console.log(startFrom, "Start from");
+
+    startFrom = "0";
+  }
+
   const followingIds = await getFollowing(prisma, userId);
 
   const followIds = followingIds.map((follow) => follow.followingId);
 
   const blogs = await prisma.blog.findMany({
+    skip: parseInt(startFrom),
+    take: 8,
     where: {
       isDeleted: false,
       visibility: "PUBLIC",
@@ -463,7 +477,7 @@ export const getBlogComments = async (c: Context) => {
   });
 
   const comments = await getComments(prisma, blogId);
-  console.log(comments," HIHI");
+  console.log(comments, " HIHI");
   if (isFollowing) {
     return c.json({
       status: "success",
@@ -563,7 +577,7 @@ export const searchBlogs = async (c: Context) => {
         },
         { content: { contains: query } },
       ],
-      // NOT: { authorId: userDetails.userId },
+      NOT: { authorId: userDetails.userId },
     },
     orderBy: {
       reactions: "desc",
