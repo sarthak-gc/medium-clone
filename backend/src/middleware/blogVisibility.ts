@@ -4,7 +4,8 @@ import { findBlog } from "../utils/blogs";
 
 export const visibilityMiddleware = async (c: Context, next: Next) => {
   const { blogId } = c.req.param();
-  const { userId } = c.get("user");
+  const user = c.get("user");
+  const userId = user?.userId;
   const prisma = getPrisma(c);
   const blog = await findBlog(prisma, blogId);
 

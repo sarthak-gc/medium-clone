@@ -25,6 +25,7 @@ import { visibilityMiddleware } from "../middleware/blogVisibility";
 const blogRouter = new Hono();
 
 blogRouter.get("/public", publicAccessMiddleware, getGlobalFeed);
+blogRouter.get("/:blogId", visibilityMiddleware, getBlog);
 
 blogRouter.use(authenticationMiddleware);
 
@@ -46,7 +47,6 @@ blogRouter.post("/:commentId/reply", replyToComment);
 blogRouter.get("/drafts", getDrafts);
 blogRouter.get("/search/:skip", searchBlogs);
 
-blogRouter.get("/:blogId", visibilityMiddleware, getBlog);
 blogRouter.post("/:blogId/react", visibilityMiddleware, reactBlog);
 blogRouter.post("/:blogId/comment", visibilityMiddleware, commentOnBlog);
 blogRouter.get("/:blogId/comments/", visibilityMiddleware, getBlogComments);
