@@ -128,6 +128,7 @@ const Login = () => {
       });
       const token = response.data.data.accessToken;
       localStorage.setItem("token", token);
+
       alert(response.data.message);
       document.cookie = `token=${token}; path=/; max-age=${3600 * 48}`;
 
@@ -136,6 +137,8 @@ const Login = () => {
       navigate("/");
     } catch (e) {
       if (e instanceof AxiosError) alert(e.response?.data.message);
+
+      console.error(e);
     } finally {
       setIsLoading(false);
     }
