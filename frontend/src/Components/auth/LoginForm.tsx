@@ -9,7 +9,6 @@ type LoginFormProp = {
   handleSubmit: (e: FormEvent<HTMLFormElement>) => void;
   formData: FormDataT;
   errors: ErrorsT;
-
   isLoading: boolean;
 };
 

@@ -4,7 +4,7 @@ import { ErrorT } from "../../pages/auth/Register";
 type FormInputProp = {
   handleFormInputChange: (e: ChangeEvent<HTMLInputElement>) => void;
   elem: string;
-  error: ErrorT;
+  error?: ErrorT;
 };
 
 const Input = ({ handleFormInputChange, elem, error }: FormInputProp) => {
@@ -28,7 +28,7 @@ const Input = ({ handleFormInputChange, elem, error }: FormInputProp) => {
         id={elem}
         value={value}
         className={`w-full px-3 pt-5 pb-2 text-sm border-2 rounded-md placeholder-transparent text-gray-700 transition duration-200 outline-none
-          ${error.status && value ? " border-red-500" : " border-gray-300"}
+          ${error?.status && value ? " border-red-500" : " border-gray-300"}
         `}
       />
       <label
@@ -36,10 +36,10 @@ const Input = ({ handleFormInputChange, elem, error }: FormInputProp) => {
         className={`absolute left-3 transition-all  bg-white text-gray-500 ${
           showLabel ? "text-xs -top-3" : "text-sm top-3 "
         }
-        ${error.status && value ? "text-red-400" : ""}
+        ${error?.status && value ? "text-red-400" : ""}
         ${isFocused && !value ? "" : ""}`}
       >
-        {error.status && value
+        {error?.status && value
           ? error.message
           : elem.charAt(0).toUpperCase() + elem.slice(1)}
       </label>

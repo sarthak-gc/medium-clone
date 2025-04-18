@@ -1,5 +1,3 @@
-import React from "react";
-
 const ReactionSkelton = () => {
   return (
     <div className="flex  text-xs text-gray-500  pt-3 mt-3 gap-4 h-6">
