@@ -189,27 +189,6 @@ const ReadBlog = () => {
         <Comment count={blogDetails.Comment.length} />
       </div>
 
-      <style jsx>{`
-        @keyframes shatter {
-          0% {
-            transform: scale(1) rotate(0deg);
-            opacity: 1;
-          }
-          50% {
-            transform: scale(1.5);
-            opacity: 0.7;
-          }
-          100% {
-            transform: scale(0);
-            opacity: 0;
-          }
-        }
-
-        .shatter {
-          animation: shatter 0.5s forwards;
-        }
-      `}</style>
-
       <h1 className="text-2xl font-bold mb-3">Comments</h1>
 
       {blogDetails.Comment.length === 0 && <h1>No responses yet</h1>}
