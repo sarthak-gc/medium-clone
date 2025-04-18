@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAppStore } from "../../store/appStore";
 import { ChangeEvent, useState } from "react";
+import { AXIOS } from "../../utils/axios";
 
 const Navbar = () => {
   const [query, setQuery] = useState<string>();
@@ -8,7 +9,24 @@ const Navbar = () => {
   const setQueryS = useAppStore().setQuery;
   const navigate = useNavigate();
   const handleBlogWrite = () => {
+    if (!isLoggedIn) {
+      if (window.confirm("Log in to start writing blog")) {
+        navigate("/login");
+        return;
+      } else {
+        return;
+      }
+    }
     navigate("/blog/write");
+  };
+
+  const handleLogout = async () => {
+    document.cookie = `token=; path=/; max-age=0`;
+    localStorage.removeItem("token");
+    const response = await AXIOS.post("/user/logout");
+    if (response.data?.status === "success") {
+      navigate("/login");
+    }
   };
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -76,17 +94,22 @@ const Navbar = () => {
             </svg>
             <button className=" rounded-md  transition">Write</button>
           </div>
-
           {/* Signin signUp */}
           {!isLoggedIn && (
             <>
-              <button className="bg-green-700 text-white px-5 py-2 rounded-full hover:bg-green-800 transition cursor-pointer">
+              <Link
+                to="/login"
+                className="bg-green-700 text-white px-5 py-2 rounded-full hover:bg-green-800 transition cursor-pointer"
+              >
                 Sign In
-              </button>
+              </Link>
 
-              <button className=" text-gray-500 hover:text-[#1f1e1e] transition">
+              <Link
+                to="/register"
+                className=" text-gray-500 hover:text-[#1f1e1e] transition"
+              >
                 Sign Up
-              </button>
+              </Link>
             </>
           )}
           {/* Notification */}
@@ -109,9 +132,33 @@ const Navbar = () => {
             </>
           )}
           {/* Avatar placeholder */}
-          <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-sm font-medium text-white ">
-            U
-          </div>
+          {isLoggedIn && (
+            <div className="relative group z-50">
+              <div className="w-8 h-8  bg-gray-300 rounded-full flex items-center justify-center text-sm font-medium text-white ">
+                U
+              </div>
+              <div className="absolute  right-0 hidden group-hover:block ">
+                <Link
+                  to="/me"
+                  className=" text-white text-xs  py-1 px-2  w-32  bg-black cursor-pointer hover:bg-gray-700 block"
+                >
+                  User Profile
+                </Link>
+                <Link
+                  to="/settings"
+                  className="bg-black text-white text-xs py-1 px-2 block  cursor-pointer hover:bg-gray-700 "
+                >
+                  Settings
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="bg-black text-white text-xs py-1 px-2 block  cursor-pointer hover:bg-gray-700 w-full text-start"
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -165,21 +212,52 @@ const Navbar = () => {
                   />
                 </svg>
                 {/* Avatar placeholder */}
-                <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-sm font-medium text-white">
-                  U
-                </div>
+                {isLoggedIn && (
+                  <div className="relative group z-50">
+                    <div className="w-8 h-8  bg-gray-300 rounded-full flex items-center justify-center text-sm font-medium text-white ">
+                      U
+                    </div>
+                    <div className="absolute  right-0 hidden group-hover:block ">
+                      <Link
+                        to="/me"
+                        className="bg-black text-white text-xs py-1 px-2 block  cursor-pointer hover:bg-gray-700 "
+                      >
+                        User Profile
+                      </Link>
+                      <Link
+                        to="/settings"
+                        className="bg-black text-white text-xs py-1 px-2 block  cursor-pointer hover:bg-gray-700 "
+                      >
+                        Settings
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="bg-black text-white text-xs py-1 px-2 block  cursor-pointer hover:bg-gray-700 w-full text-start"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
 
           {!isLoggedIn && (
             <div className="flex gap-4">
-              <button className="text-black hover:text-gray-700 transition">
+              <Link
+                to="/login"
+                className="bg-green-700 text-white px-5 py-2 rounded-full hover:bg-green-800 transition cursor-pointer"
+              >
                 Sign In
-              </button>
-              <button className="text-black hover:text-gray-700 transition">
+              </Link>
+
+              <Link
+                to="/register"
+                className=" text-gray-500 hover:text-[#1f1e1e] transition"
+              >
                 Sign Up
-              </button>
+              </Link>
             </div>
           )}
         </div>

@@ -18,14 +18,10 @@ const FollowingFeed = () => {
       setFetching(true);
 
       const response = await AXIOS.get(
-        `/blog/followings?startFrom${startFrom}`,
-        {
-          // withCredentials: true,
-        }
+        `/blog/followings?startFrom=${startFrom}`
       );
-      // console.log(response);
+
       if (response.data.data.blogs.length < 8) {
-        // console.log("EMPTY RESPONSE");
         setNoMore(true);
       }
       setBlogs((prev) => {
@@ -58,7 +54,6 @@ const FollowingFeed = () => {
         !noMore &&
         !fetching
       ) {
-        console.log("++");
         setStartFrom((prev) => prev + 8);
       }
     };
@@ -71,7 +66,7 @@ const FollowingFeed = () => {
   }, [fetching, noMore]);
 
   return (
-    <div className="px-4 bg-red-500">
+    <div className="px-4 ">
       <ScrollBar />
       {!loading && blogs.length === 0 && (
         <div className="w-full h-full  mt-50 text-center">
@@ -85,5 +80,3 @@ const FollowingFeed = () => {
 };
 
 export default FollowingFeed;
-
-

@@ -25,9 +25,8 @@ import { BlogType, ReactionType, UserType } from "../generated/prisma";
 export const signUp = async (c: Context) => {
   try {
     const body = await c.req.json();
-    console.log(body, "OUTSIDE TRY");
+
     let profileStatus: string = "PUBLIC";
-    console.log(body, "INSIDE TRY");
     const { username, email, password, profile } = body;
 
     if (!username || !email || !password) {
@@ -91,7 +90,7 @@ export const signIn = async (c: Context) => {
 
     setCookie(c, "token", refreshToken, {
       httpOnly: true,
-      sameSite: "Strict",
+      sameSite: "Lax",
     });
     return c.json({
       message: "Login success",
@@ -116,8 +115,6 @@ export const getProfile = async (c: Context) => {
   if (isNaN(parseInt(startFrom))) {
     startFrom = "0";
   }
-  console.log("hi", startFrom);
-
   const userDetails = c.get("userDetails");
 
   if (!profileId) {
@@ -222,7 +219,6 @@ export const updatePassword = async (c: Context) => {
 
 export const logout = async (c: Context) => {
   setCookie(c, "token", "");
-
   return c.json({ status: "success", message: "Logout success" });
 };
 
@@ -503,8 +499,6 @@ export const searchUser = async (c: Context) => {
     });
   }
 
-  console.log(query);
-
   const prisma = getPrisma(c);
 
   const users = await prisma.user.findMany({
@@ -556,8 +550,6 @@ export const seedData = async (c: Context) => {
     users.push(user);
   }
 
-  console.log("10 users created");
-
   // Step 2: Random followings
   for (const user of users) {
     const followCount = faker.number.int({ min: 1, max: 5 });
@@ -575,8 +567,6 @@ export const seedData = async (c: Context) => {
       });
     }
   }
-
-  console.log("random followings added");
 
   const blogs = [];
 
@@ -600,8 +590,6 @@ export const seedData = async (c: Context) => {
       blogs.push(blog);
     }
   }
-
-  console.log("blogs created");
 
   // Step 4: Each blog gets 2 random reactions
   for (const blog of blogs) {
@@ -629,8 +617,6 @@ export const seedData = async (c: Context) => {
     }
   }
 
-  console.log("reactions added");
-
   // Step 5: Random comments (0–10) per blog
   for (const blog of blogs) {
     const commentCount = faker.number.int({ min: 0, max: 10 });
@@ -646,8 +632,6 @@ export const seedData = async (c: Context) => {
       });
     }
   }
-
-  console.log("comments added");
 
   return c.json({ msg: "Quick seeding completed successfully" });
 };

@@ -3,12 +3,25 @@ import router from "./routes";
 import { cors } from "hono/cors";
 
 const app = new Hono();
+
+// app.use(
+//   cors({
+//     origin: "*",
+//     allowHeaders: ["Content-Type", "Authorization"],
+//     allowMethods: ["POST", "GET", "OPTIONS"],
+//     exposeHeaders: ["Content-Length", "X-Kuma-Revision"],
+//     maxAge: 600,
+//     credentials: true,
+//   })
+// );
+
 app.use(
   cors({
-    origin: "*",
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
+
 app.route("/api/v1", router);
 
 export default app;

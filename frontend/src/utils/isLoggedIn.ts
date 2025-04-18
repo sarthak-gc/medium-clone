@@ -19,8 +19,6 @@ export const isLoggedIn = () => {
 
   try {
     const { user } = jwtDecode<TokenReturnT>(token);
-    // console.log(user);
-
     const { setUser } = useUserStore.getState();
     const setIsLoggedIn = useAppStore.getState().setIsLoggedIn;
 

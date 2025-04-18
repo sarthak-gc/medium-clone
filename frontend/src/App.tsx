@@ -102,12 +102,10 @@ const App = () => {
         {
           path: ":blogId/read",
           element: (
-            <ProtectedRoute>
-              <>
-                <Navbar />
-                <ReadBlog />
-              </>
-            </ProtectedRoute>
+            <>
+              <Navbar />
+              <ReadBlog />
+            </>
           ),
         },
         {

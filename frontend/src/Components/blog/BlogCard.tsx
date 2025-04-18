@@ -13,8 +13,6 @@ const BlogCard = ({ blog }: BlogCardProp) => {
   const [, flag] = useState<boolean>(false);
   const navigate = useNavigate();
   const handleClick = (id: string) => {
-    console.log("Blog clicked");
-
     navigate(`/blog/${id}/read`, {
       state: {
         blogDetails: blog,
@@ -27,7 +25,6 @@ const BlogCard = ({ blog }: BlogCardProp) => {
   };
 
   const handleProfileClick = (id: string) => {
-    console.log("User clicked");
     navigate(`/user/${id}`);
   };
 

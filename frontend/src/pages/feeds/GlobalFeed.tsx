@@ -50,12 +50,10 @@ const GlobalFeed = () => {
       if (!noMore) {
         setFetching(true);
         const response = await AXIOS.get(`/blog/public?startFrom=${startFrom}`);
-        // console.log(response.data.data.blogs[0]);
+
         if (response.data.data.blogs.length < 8) {
-          // console.log("EMPTY RESPONSE");
           setNoMore(true);
         }
-        // setBlogs((prev) => [...prev, ...response.data.data.blogs]);
 
         setBlogs((prev) => {
           const newBlogs = response.data.data.blogs;
@@ -100,7 +98,7 @@ const GlobalFeed = () => {
   }, [fetching, noMore]);
 
   return (
-    <div className="px-4 bg-red-500">
+    <div className="px-4">
       <ScrollBar />
       {!loading && blogs.length === 0 && (
         <div className="w-full h-full  mt-50 text-center">

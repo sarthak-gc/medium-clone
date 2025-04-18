@@ -32,10 +32,7 @@ const UserProfile = () => {
     createdAt: "",
   });
   const followUser = async (id: string) => {
-    console.log(id);
-    const response = await AXIOS.post(`/user/follow/${id}`);
-
-    console.log(response);
+    await AXIOS.post(`/user/follow/${id}`);
   };
   useEffect(() => {
     const getUserDetails = async () => {
@@ -82,7 +79,6 @@ const UserProfile = () => {
         !fetching
       ) {
         setStartFrom((prev) => prev + 5);
-        console.log("++");
       }
     };
 

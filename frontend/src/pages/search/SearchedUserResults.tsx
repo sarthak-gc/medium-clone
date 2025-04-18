@@ -21,15 +21,10 @@ const SearchedUserResults = () => {
   const navigate = useNavigate();
 
   const handleClick = (id: string) => {
-    console.log("User clicked");
-    console.log(id);
     navigate(`/user/${id}`);
   };
   const followUser = async (id: string) => {
-    console.log(id);
-    const response = await AXIOS.post(`/user/follow/${id}`);
-
-    console.log(response);
+    await AXIOS.post(`/user/follow/${id}`);
   };
 
   const location = useLocation();
@@ -43,7 +38,6 @@ const SearchedUserResults = () => {
         `/user/search/${startFrom}?query=${searchQuery}`
       );
 
-      // console.log(response.data.data.users);
       if (response.data.data.users.length === 0) {
         setNoMore(true);
       }

@@ -121,7 +121,7 @@ const Login = () => {
 
     try {
       setIsLoading(true);
-      // // console.log(AXIOS);
+
       const response = await AXIOS.post("user/signin", {
         username: formData.username,
         password: formData.password,

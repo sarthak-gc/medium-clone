@@ -17,13 +17,11 @@ const Writeblog = () => {
   const handlePublish = async () => {
     setIsPublishing(true);
     try {
-      // console.log("Publishing....");
-
       const response = await AXIOS.post("/blog/create", {
         title,
         content,
       });
-      // console.log(response.data.data.blog);
+
       setIsPublished(true);
       setTimeout(() => {
         navigate(`/blog/${response.data.data.blog.blogId}/read`);

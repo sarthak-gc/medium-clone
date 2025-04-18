@@ -18,8 +18,6 @@ export const passUpdate = async (
   userId: string,
   hashedPassword: string
 ) => {
-  console.log(userId);
-
   await prisma.user.update({
     where: {
       userId,

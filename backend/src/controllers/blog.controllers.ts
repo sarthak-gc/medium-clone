@@ -161,14 +161,11 @@ export const getBlog = async (c: Context) => {
 export const getGlobalFeed = async (c: Context) => {
   const prisma = getPrisma(c);
   let startFrom = c.req.query("startFrom");
-  console.log(startFrom, " OUTSIDE");
 
   if (!startFrom) {
     startFrom = "0";
   }
   if (isNaN(parseInt(startFrom))) {
-    console.log(startFrom, "Start from");
-
     startFrom = "0";
   }
   const blogs = await prisma.blog.findMany({
@@ -232,14 +229,11 @@ export const getFollowingFeed = async (c: Context) => {
   const prisma = getPrisma(c);
 
   let startFrom = c.req.query("startFrom");
-  console.log(startFrom, " OUTSIDE");
 
   if (!startFrom) {
     startFrom = "0";
   }
   if (isNaN(parseInt(startFrom))) {
-    console.log(startFrom, "Start from");
-
     startFrom = "0";
   }
 
@@ -477,7 +471,7 @@ export const getBlogComments = async (c: Context) => {
   });
 
   const comments = await getComments(prisma, blogId);
-  console.log(comments, " HIHI");
+
   if (isFollowing) {
     return c.json({
       status: "success",
@@ -566,7 +560,7 @@ export const searchBlogs = async (c: Context) => {
   const userDetails = c.get("userDetails");
 
   const prisma = getPrisma(c);
-  console.log(startFrom, query);
+
   const blogs = await prisma.blog.findMany({
     skip: startFrom,
     take: 5,

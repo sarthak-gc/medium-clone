@@ -34,7 +34,6 @@ export const authenticationMiddleware = async (c: Context, next: Next) => {
     }
 
     c.set("userDetails", validUser);
-
     return await next();
   } catch (e) {
     console.log(e);

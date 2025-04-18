@@ -7,6 +7,7 @@ import AvatarName from "../../Components/user/AvatarName";
 import Comment from "../../Components/ui/Comment";
 import Like from "../../Components/ui/Like";
 import ReadSkeleton from "../../Components/skeleton/ReadSkeleton";
+import { useAppStore } from "../../store/appStore";
 
 const ReadBlog = () => {
   const [blogDetails, setBlogDetails] = useState<BlogT>({
@@ -21,6 +22,7 @@ const ReadBlog = () => {
       username: "",
     },
   });
+  const isLoggedIn = useAppStore.getState().isLoggedIn;
   const [loading, setLoading] = useState<boolean>(true);
   const { blogId } = useParams();
   const [comment, setComment] = useState<string>("");
@@ -54,6 +56,14 @@ const ReadBlog = () => {
     }
   };
   const handleCommentSend = async (blogId: string) => {
+    if (!isLoggedIn) {
+      if (window.confirm("Login to comment")) {
+        navigate("/login");
+        // return;
+      } else {
+        return;
+      }
+    }
     setSending(true);
     const response = await AXIOS.post(`/blog/${blogId}/comment`, {
       comment,
@@ -61,7 +71,7 @@ const ReadBlog = () => {
     setSending(false);
 
     const commentDetails = response.data.data.commentDetails;
-    console.log(sending, " Comment sending....");
+
     setComment("");
     blogDetails.Comment.push({
       createdAt: new Date(commentDetails.createdAt),
@@ -77,11 +87,10 @@ const ReadBlog = () => {
   };
 
   const setReaction = async (reactionType: string, blogId: string) => {
-    console.log("reacted");
-    const response = await AXIOS.post(`/blog/${blogId}/react`, {
+    await AXIOS.post(`/blog/${blogId}/react`, {
       type: reactionType,
     });
-    console.log(response.data);
+
     setShowReactionOptions(false);
   };
 
@@ -111,80 +120,6 @@ const ReadBlog = () => {
       <div className="text-[#353535]  whitespace-pre-line">
         {blogDetails.content}
       </div>
-
-      {/* <div className="flex  text-xs text-gray-500  pt-3 mt-3 gap-4 h-6 mb-12 relative ">
-        {showReactionOptions && (
-          <ul className="flex space-x-4  p-4 rounded-lg absolute -top-10 -left-10 ">
-            <li className="relative group">
-              <button
-                className="p-2 rounded-full text-white"
-                onClick={() => setReaction("Heart", blogDetails.blogId)}
-              >
-                ❤️
-              </button>
-              <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 text-sm text-white bg-black rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                Heart
-              </span>
-            </li>
-
-            <li className="relative group">
-              <button
-                className="p-2 bg-blue-600 rounded-full text-white"
-                onClick={() => setReaction("Like", blogDetails.blogId)}
-              >
-                👍
-              </button>
-              <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 text-sm text-white bg-black rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                Like
-              </span>
-            </li>
-
-            <li className="relative group">
-              <button
-                className="p-2 bg-yellow-600 rounded-full text-white"
-                onClick={() => setReaction("Laugh", blogDetails.blogId)}
-              >
-                😂
-              </button>
-              <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 text-sm text-white bg-black rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                Laugh
-              </span>
-            </li>
-
-            <li className="relative group">
-              <button
-                className="p-2 bg-orange-600 rounded-full text-white"
-                onClick={() => setReaction("Angry", blogDetails.blogId)}
-              >
-                😡
-              </button>
-              <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 text-sm text-white bg-black rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                Angry
-              </span>
-            </li>
-
-            <li className="relative group">
-              <button
-                className="p-2 bg-gray-600 rounded-full text-white"
-                onClick={() => setReaction("Dislike", blogDetails.blogId)}
-              >
-                👎
-              </button>
-              <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 text-sm text-white bg-black rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                Dislike
-              </span>
-            </li>
-          </ul>
-        )}
-        <Like
-          showReactionList={() => {
-            navigate(`/blog/${blogId}/reactions`);
-          }}
-          toggleReactionOptions={toggleReactionOptions}
-          count={blogDetails.Reactions.length}
-        />
-        <Comment count={blogDetails.Comment.length} />
-      </div> */}
 
       <div className="flex text-xs text-gray-500 pt-3 mt-3 gap-4 h-6 mb-12 relative">
         {showReactionOptions && (
