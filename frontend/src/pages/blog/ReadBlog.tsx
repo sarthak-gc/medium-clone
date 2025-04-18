@@ -161,8 +161,7 @@ const ReadBlog = () => {
                   className={`p-3 rounded-full text-white ${bgColor} transform transition-transform duration-300 ease-in-out hover:scale-110 active:scale-90`}
                   onClick={() => {
                     const emoji = document.querySelector(`#emoji-${action}`);
-                    emoji.classList.add("shatter");
-
+                    emoji?.classList.add("shatter");
                     setTimeout(() => {
                       toggleReactionOptions();
                       setReaction(action, blogDetails.blogId);
