@@ -130,8 +130,9 @@ const Login = () => {
       localStorage.setItem("token", token);
 
       alert(response.data.message);
-      document.cookie = `token=${token}; path=/; max-age=${3600 * 48}`;
-
+      document.cookie = `token=${token};; path=/; max-age=0 SameSite=None; Secure; Path=/; HttpOnly max-age=${
+        3600 * 48
+      }`;
       setIsLoggedIn(true);
 
       navigate("/");

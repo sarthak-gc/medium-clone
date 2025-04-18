@@ -90,7 +90,8 @@ export const signIn = async (c: Context) => {
 
     setCookie(c, "token", refreshToken, {
       httpOnly: true,
-      sameSite: "Lax",
+      sameSite: "None",
+      secure: true,
     });
     return c.json({
       message: "Login success",

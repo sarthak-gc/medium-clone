@@ -18,6 +18,18 @@ router.use(async (c, next) => {
       "Access-Control-Allow-Origin",
       "https://medium-rare-three.vercel.app"
     );
+    c.res.headers.set(
+      "Access-Control-Allow-Origin",
+      "https://medium-rare-three.vercel.app"
+    );
+    c.res.headers.set(
+      "Access-Control-Allow-Methods",
+      "GET,HEAD,OPTIONS,POST,PUT"
+    );
+    c.res.headers.set(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    );
 
     await next();
   }

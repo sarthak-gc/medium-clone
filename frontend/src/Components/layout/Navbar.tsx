@@ -21,7 +21,7 @@ const Navbar = () => {
   };
 
   const handleLogout = async () => {
-    document.cookie = `token=; path=/; max-age=0`;
+    document.cookie = `token=; path=/; max-age=0 SameSite=None; Secure; Path=/; HttpOnly`;
     localStorage.removeItem("token");
     const response = await AXIOS.post("/user/logout");
     if (response.data?.status === "success") {
