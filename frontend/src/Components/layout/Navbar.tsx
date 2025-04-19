@@ -30,7 +30,6 @@ const Navbar = () => {
   };
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value.trim());
     setQueryS(e.target.value);
   };
 
