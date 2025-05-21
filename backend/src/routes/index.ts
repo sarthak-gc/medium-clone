@@ -16,11 +16,11 @@ router.use(async (c, next) => {
   ) {
     c.res.headers.set(
       "Access-Control-Allow-Origin",
-      "https://medium-rare-three.vercel.app"
+      "https://medium-rare.sarthakgc.com.np"
     );
     c.res.headers.set(
       "Access-Control-Allow-Origin",
-      "https://medium-rare-three.vercel.app"
+      "https://medium-rare.sarthakgc.com.np"
     );
     c.res.headers.set(
       "Access-Control-Allow-Methods",
