@@ -7,6 +7,9 @@
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
+.ck-editor__editable {
+  min-height: 75vh !important;
+}
 
 @keyframes shatter {
   0% {

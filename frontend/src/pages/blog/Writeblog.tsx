@@ -1,18 +1,27 @@
 import { useRef, useState } from "react";
 import { AXIOS } from "../../utils/axios";
 import { Link, useNavigate } from "react-router-dom";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import {
+  ClassicEditor,
+  Essentials,
+  Paragraph,
+  Bold,
+  Italic,
+  FontSize,
+  FontColor,
+} from "ckeditor5";
+import "ckeditor5/ckeditor5.css";
 
 const Writeblog = () => {
   const [title, setTitle] = useState<string>("");
-  const [letGo, setLetGo] = useState<boolean>(false);
+  // const [letGo, setLetGo] = useState<boolean>(false);
   const [content, setContent] = useState<string>("");
   const [showLeft, setShowLeft] = useState<boolean>(true);
   const [isPublished, setIsPublished] = useState<boolean>(false);
   const [isPublishing, setIsPublishing] = useState<boolean>(false);
 
   const titleAreaRef = useRef<HTMLInputElement | null>(null);
-  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
-
   const navigate = useNavigate();
   const handlePublish = async () => {
     setIsPublishing(true);
@@ -107,11 +116,11 @@ const Writeblog = () => {
         <div className=" relative ">
           <input
             ref={titleAreaRef}
-            onKeyUp={(e) => {
-              if (e.code === "Enter") {
-                textAreaRef.current?.focus();
-              }
-            }}
+            // onKeyUp={(e) => {
+            //   if (e.code === "Enter") {
+            //     textAreaRef.current?.focus();
+            //   }
+            // }}
             onChange={(e) => {
               setTitle(e.target.value);
             }}
@@ -133,27 +142,40 @@ const Writeblog = () => {
         </div>
 
         <div className="h-full">
-          <textarea
-            onKeyUp={(e) => {
-              if (content.length === 0 && e.key === "Backspace" && letGo) {
-                titleAreaRef.current?.focus();
-              }
-              if (content.length === 0) {
-                setLetGo(true);
-              }
+          <CKEditor
+            editor={ClassicEditor}
+            onReady={(editor) => {
+              editor.ui.view.editable.element!.style.height = "75vh";
             }}
-            ref={textAreaRef}
-            onChange={(e) => {
-              setLetGo(false);
-              setContent(e.target.value);
+            onChange={(_, editor) => {
+              const data = editor.getData();
+              setContent(data);
             }}
-            name="content"
-            id="content"
-            placeholder={`Tell your story...`}
-            className={`w-full text-lg mt-2  scrollbar-none font-light  outline-none placeholder-gray-300 md:px-4 h-7/8 resize-none ${
-              content.length === 0 ? "caret-gray-300" : "caret-black"
-            }`}
-          ></textarea>
+            config={{
+              licenseKey: "GPL",
+              plugins: [
+                Essentials,
+                Paragraph,
+                Bold,
+                Italic,
+                FontSize,
+                FontColor,
+              ],
+              toolbar: [
+                "undo",
+                "redo",
+                "|",
+                "bold",
+                "italic",
+                "|",
+                "fontSize",
+                "fontColor",
+              ],
+              fontSize: {
+                options: [9, 11, 13, "default", 17, 19, 21],
+              },
+            }}
+          />
         </div>
       </form>
     </div>

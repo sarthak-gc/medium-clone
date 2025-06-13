@@ -117,9 +117,10 @@ const ReadBlog = () => {
         />
       </div>
 
-      <div className="text-[#353535]  whitespace-pre-line">
-        {blogDetails.content}
-      </div>
+      <div
+        className="text-[#353535]"
+        dangerouslySetInnerHTML={{ __html: blogDetails.content }}
+      />
 
       <div className="flex text-xs text-gray-500 pt-3 mt-3 gap-4 h-6 mb-12 relative">
         {showReactionOptions && (
